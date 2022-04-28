@@ -6,8 +6,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.modules.loss import BCEWithLogitsLoss
 
-from layers import StructuralAttentionLayer
-from layers import TemporalAttentionLayer
+from Model.layers import StructuralAttentionLayer
+from Model.layers import TemporalAttentionLayer
 
 class DySAT(nn.Module):
     def __init__(self, args, num_features, time_length, sample_masks, method):
