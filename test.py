@@ -53,6 +53,7 @@ def _test_distributed(rank, args, real_dist):
 
 
 def _test_local(args):
+    args['device'] = torch.device("cuda:0")
     run_dgnn(args)
 
 
