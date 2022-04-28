@@ -14,7 +14,7 @@ from Model.MLP import Classifier
 from sklearn.metrics import f1_score, roc_auc_score
 
 def _My_DGNN():
-    def __init__(self, in_feats):
+    def __init__(self, in_feats = None):
         super(_My_DGNN, self).__init__()
         self.dgnn = DySAT(in_channels = in_feats)
         self.classificer = Classifier(in_feature = in_feats)
