@@ -6,7 +6,7 @@ import torch
 
 from test_function import run_dgnn_distributed, run_dgnn
 
-comm_method = 'nccl' # currently use 'gloo' for CPU process communication
+comm_method = 'gloo' # currently use 'gloo' for CPU process communication
 
 # TODO: implement the test with pytest framework
 
@@ -19,7 +19,7 @@ def _test_distributed(rank, args, real_dist):
         device = torch.cuda.set_device(rank)
         args['device'] = device
     else:  
-        device = torch.device("cuda:0")
+        device = torch.device("cpu")
         args['device'] = device
 
     # init the communication group
