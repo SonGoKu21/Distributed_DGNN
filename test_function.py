@@ -136,13 +136,14 @@ def run_dgnn_distributed(args):
                                                                 ACC))
 
     # print the training result info
-    best_f1_epoch = epochs_f1_score.index(max(epochs_f1_score))
-    best_auc_epoch = epochs_auc.index(max(epochs_auc))
-    best_acc_epoch = epochs_acc.index(max(epochs_acc))
+    if rank == world_size - 1:
+        best_f1_epoch = epochs_f1_score.index(max(epochs_f1_score))
+        best_auc_epoch = epochs_auc.index(max(epochs_auc))
+        best_acc_epoch = epochs_acc.index(max(epochs_acc))
 
-    print("Best f1 score epoch: {}, Best f1 score: {}".format(best_f1_epoch, max(epochs_f1_score)))
-    print("Best auc epoch: {}, Best auc score: {}".format(best_auc_epoch, max(epochs_auc)))
-    print("Best acc epoch: {}, Best acc score: {}".format(best_acc_epoch, max(epochs_acc)))
+        print("Best f1 score epoch: {}, Best f1 score: {}".format(best_f1_epoch, max(epochs_f1_score)))
+        print("Best auc epoch: {}, Best auc score: {}".format(best_auc_epoch, max(epochs_auc)))
+        print("Best acc epoch: {}, Best acc score: {}".format(best_acc_epoch, max(epochs_acc)))
 
 
 def run_dgnn(args):
