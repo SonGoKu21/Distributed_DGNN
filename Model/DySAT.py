@@ -35,7 +35,6 @@ def _embedding_comm(args, x):
     return final
 
 
-
 class DySAT(nn.Module):
     def __init__(self, args, num_features):
         '''
