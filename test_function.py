@@ -90,7 +90,8 @@ def run_dgnn(args):
 
     model = _My_DGNN(args, in_feats=load_feats[0].shape[1]).to(device)
 
-    loss_func = nn.BCELoss()
+    # loss_func = nn.BCELoss()
+    loss_func = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=args['learning_rate'], weight_decay=args['weight_decay'])
 
     # results info
