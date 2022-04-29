@@ -12,8 +12,6 @@ comm_method = 'gloo' # currently use 'gloo' for CPU process communication
 
 def _test_distributed(rank, args, real_dist):
     world_size = args['world_size']
-    dist_init_method = 'tcp://{master_ip}:{master_port}'.format(
-            master_ip='127.0.0.1', master_port='12345')
 
     if real_dist:
         device = torch.cuda.set_device(rank)
@@ -24,7 +22,7 @@ def _test_distributed(rank, args, real_dist):
 
     # init the communication group
     dist_init_method = 'tcp://{master_ip}:{master_port}'.format(
-            master_ip='127.0.0.1', master_port='12345')
+            master_ip='127.0.0.1', master_port='12346')
     torch.distributed.init_process_group(backend = comm_method,
                                          init_method = dist_init_method,
                                          world_size = world_size,
