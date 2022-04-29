@@ -83,7 +83,7 @@ def run_dgnn_distributed(args):
     graphs = convert_graphs(load_g, load_adj, load_feats, args['data_str'])
 
     model = _My_DGNN(args, in_feats=load_feats[0].shape[1]).to(device)
-    model.ser_comm()
+    model.set_comm()
     model = LocalDDP(copy.deepcopy(model), mp_group, dp_group, world_size)
 
     # loss_func = nn.BCELoss()
