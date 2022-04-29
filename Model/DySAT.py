@@ -16,8 +16,7 @@ def _embedding_comm(args, x):
     world_size = args['world_size']
 
     # comm_tensor = torch.ones_like(x)
-    size = x.size()
-    comm_tensor = torch.empty(size=(size,), dtype=torch.float)
+    comm_tensor = x.clone().detach()
 
     result_list = []
     for i in range (world_size - 1):
