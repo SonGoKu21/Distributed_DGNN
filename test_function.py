@@ -84,7 +84,8 @@ def run_dgnn_distributed(args):
 
     model = _My_DGNN(args, in_feats=load_feats[0].shape[1]).to(device)
     model.set_comm()
-    model = LocalDDP(copy.deepcopy(model), mp_group, dp_group, world_size)
+    # model = LocalDDP(copy.deepcopy(model), mp_group, dp_group, world_size)
+    model = DDP(model, device = rank, process_group=dp_group)
 
     # loss_func = nn.BCELoss()
     loss_func = nn.CrossEntropyLoss()
