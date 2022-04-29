@@ -22,13 +22,16 @@ def _embedding_comm(args, x):
     for i in range (world_size - 1):
         if i > rank:
             break
-        if i == rank: # send embeddings
-            comm_tensor = x.clone().detach()
-            print('rank: {} with send tensor {}'.format(rank, comm_tensor))
-            torch.distributed.broadcast(comm_tensor, i, group = mp_group[i])
-        else: # receive embeddings
-            torch.distributed.broadcast(comm_tensor, i, group = mp_group[i])
+        torch.distributed.broadcast(comm_tensor, i, group = mp_group[i])
+        if i != rank:
             result_list.append(comm_tensor)
+        # if i == rank: # send embeddings
+        #     # comm_tensor = x.clone().detach()
+        #     # print('rank: {} with send tensor {}'.format(rank, comm_tensor))
+        #     torch.distributed.broadcast(comm_tensor, i, group = mp_group[i])
+        # else: # receive embeddings
+        #     torch.distributed.broadcast(comm_tensor, i, group = mp_group[i])
+        #     result_list.append(comm_tensor)
     
     if len(result_list) > 0:
         result_list.append(x)
