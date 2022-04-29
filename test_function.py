@@ -17,7 +17,7 @@ class _My_DGNN(torch.nn.Module):
     def __init__(self, args, in_feats = None):
         super(_My_DGNN, self).__init__()
         self.dgnn = DySAT(args, num_features = in_feats)
-        self.classificer = Classifier(in_feature = in_feats)
+        self.classificer = Classifier(in_feature = self.dgnn.out_feats)
     def forward(self, graphs, nids):
         final_emb = self.dgnn(graphs)
         # print(nids)
@@ -88,7 +88,6 @@ def run_dgnn(args):
     # convert graphs to dgl or pyg graphs
     graphs = convert_graphs(load_g, load_adj, load_feats, args['data_str'])
 
-    print(load_feats[0].shape[1])
     model = _My_DGNN(args, in_feats=load_feats[0].shape[1]).to(device)
 
     loss_func = nn.BCELoss()

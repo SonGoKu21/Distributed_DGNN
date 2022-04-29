@@ -134,11 +134,10 @@ def load_graphs(args):
 
 def get_data_example(graphs, args, local_time_steps):
     r"""
-    Load train/val/test examples to evaluate link prediction performance (classification)
-    evaluation
-    1. train_edges/train_edges_false: train the LogisticRegression model
-    2. val_edges/val_edges_false: get the validation results
-    3. test_edges/test_edges_false: get the test results
+    Generate train/val/test samples to evaluate link prediction performance
+    1. train_edges/train_edges_false: training samples
+    2. val_edges/val_edges_false: validation samples
+    3. test_edges/test_edges_false: test samples
     Note: the node embeddings for each edge is generated from the DySAT model
     """
     rank = args['rank']

@@ -46,6 +46,7 @@ class DySAT(nn.Module):
         self.temporal_layer_config = [128]
         self.spatial_drop = 0.1
         self.temporal_drop = 0.9
+        self.out_feats = 128
 
         self.n_hidden = self.temporal_layer_config[-1]
         # self.method = method
