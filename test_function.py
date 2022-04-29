@@ -2,6 +2,7 @@ import numpy as np
 import torch
 import torch.utils.data as Data
 import torch.nn as nn
+import copy
 
 from data_process import load_graphs
 from data_process import get_data_example
@@ -12,12 +13,24 @@ from data_process import convert_graphs
 from Model.DySAT import DySAT
 from Model.MLP import Classifier
 from sklearn.metrics import f1_score, roc_auc_score
+from torch.nn.parallel import DistributedDataParallel as DDP
+from customized_ddp import DistributedGroupedDataParallel as LocalDDP
 
 class _My_DGNN(torch.nn.Module):
     def __init__(self, args, in_feats = None):
         super(_My_DGNN, self).__init__()
         self.dgnn = DySAT(args, num_features = in_feats)
         self.classificer = Classifier(in_feature = self.dgnn.out_feats)
+
+    def set_comm(self):
+        for p in self.dgnn.structural_attn.parameters():
+            setattr(p, 'mp_comm', 'mp')
+            setattr(p, 'dp_comm', 'dp')
+        for p in self.dgnn.temporal_attn.parameters():
+            setattr(p, 'dp_comm', 'dp')
+        for p in self.classificer.parameters():
+            setattr(p, 'dp_comm', 'dp')
+
     def forward(self, graphs, nids):
         final_emb = self.dgnn(graphs)
         # print(nids)
@@ -33,10 +46,17 @@ class _My_DGNN(torch.nn.Module):
         # print(input_emb)
         return self.classificer(input_emb)
 
+
 # TODO: complete the global forward
 def run_dgnn_distributed(args):
     args['distributed'] = True
     device = args['device']
+    rank = args['rank']
+    world_size = args['world_size']
+    if rank != world_size - 1:
+        mp_group = args['mp_group'][rank]
+    else: mp_group = None
+    dp_group = args['dp_group']
 
     # TODO: Unevenly slice graphs
     # load graphs
@@ -63,6 +83,8 @@ def run_dgnn_distributed(args):
     graphs = convert_graphs(load_g, load_adj, load_feats, args['data_str'])
 
     model = _My_DGNN(args, in_feats=load_feats[0].shape[1]).to(device)
+    model.ser_comm()
+    model = LocalDDP(copy.deepcopy(model), mp_group, dp_group, world_size)
 
     # loss_func = nn.BCELoss()
     loss_func = nn.CrossEntropyLoss()
@@ -90,7 +112,7 @@ def run_dgnn_distributed(args):
             optimizer.step()
         # print(out)
         # test
-        if epoch % args['test_freq'] == 0:
+        if epoch % args['test_freq'] == 0 and rank == world_size - 1:
             # test_source_id = test_data[:, 0]
             # test_target_id = test_data[:, 1]
             model.eval()

@@ -15,7 +15,6 @@ def _embedding_comm(args, x):
     rank = args['rank']
     world_size = args['world_size']
 
-    # comm_tensor = torch.ones_like(x)
     comm_tensor = x.clone().detach()
     
     result_list = []
@@ -25,18 +24,11 @@ def _embedding_comm(args, x):
         torch.distributed.broadcast(comm_tensor, i, group = mp_group[i])
         if i != rank:
             result_list.append(comm_tensor)
-        if i == rank: # send embeddings
-        #     # comm_tensor = x.clone().detach()
-            print('rank: {} with send tensor {}'.format(rank, comm_tensor))
-        #     torch.distributed.broadcast(comm_tensor, i, group = mp_group[i])
-        # else: # receive embeddings
-        #     torch.distributed.broadcast(comm_tensor, i, group = mp_group[i])
-        #     result_list.append(comm_tensor)
     
     if len(result_list) > 0:
         result_list.append(x)
         final = torch.cat(result_list, 1)
-        print('rank: {} with fused tensor {}'.format(rank, final))
+        # print('rank: {} with fused tensor {}'.format(rank, final))
         return final
     else: final = x.clone()
 
@@ -112,7 +104,7 @@ class DySAT(nn.Module):
             structural_outputs_padded.append(padded)
         structural_outputs_padded = torch.cat(structural_outputs_padded, dim=1) # [N, T, F]
 
-        print('rank: {} with tensor size {}'.format(self.args['rank'], structural_outputs_padded.size()))
+        # print('rank: {} with tensor size {}'.format(self.args['rank'], structural_outputs_padded.size()))
         # exchange node embeddings
         fuse_structural_output = _embedding_comm(self.args, structural_outputs_padded)
 
