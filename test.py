@@ -61,6 +61,7 @@ def _test_local(args):
 
 
 def _test_dp(args):
+    torch.multiprocessing.set_start_method('spawn')
     real_dist = False
     world_size = args['world_size']
 
