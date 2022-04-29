@@ -103,11 +103,12 @@ def run_dgnn(args):
         Loss = []
         for step, (batch_x, batch_y) in enumerate(loader):
             model.train()
+            print(batch_y)
             batch_x = batch_x.to(device)
             batch_y = batch_y.to(device)
             graphs = [graph.to(device) for graph in graphs]
             out = model(graphs, batch_x)
-            print(out.squeeze(dim=-1))
+            # print(out.squeeze(dim=-1))
             loss = loss_func(out.squeeze(dim=-1), batch_y)
             # Loss.append(loss.item())
             optimizer.zero_grad()
