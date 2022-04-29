@@ -16,7 +16,7 @@ from sklearn.metrics import f1_score, roc_auc_score
 class _My_DGNN():
     def __init__(self, args, in_feats = None):
         super(_My_DGNN, self).__init__()
-        self.dgnn = DySAT(args, in_channels = in_feats)
+        self.dgnn = DySAT(args, num_features = in_feats)
         self.classificer = Classifier(in_feature = in_feats)
     def forward(self, graphs, nids):
         final_emb = []
