@@ -88,6 +88,7 @@ def run_dgnn(args):
     # convert graphs to dgl or pyg graphs
     graphs = convert_graphs(load_g, load_adj, load_feats, args['data_str'])
 
+    print(load_feats[0].shape[1])
     model = _My_DGNN(args, in_feats=load_feats[0].shape[1]).to(device)
 
     loss_func = nn.BCELoss()
