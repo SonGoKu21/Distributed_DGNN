@@ -19,11 +19,7 @@ class _My_DGNN(torch.nn.Module):
         self.dgnn = DySAT(args, num_features = in_feats)
         self.classificer = Classifier(in_feature = in_feats)
     def forward(self, graphs, nids):
-        final_emb = []
-        for i in range(len(graphs)):
-            graphs[i] = graphs[i]
-            h_0 = self.dgnn(graphs[i].x, graphs[i].edge_index, graphs[i].edge_weight)
-            final_emb.append(h_0)
+        final_emb = self.dgnn(graphs)
         # print(nids)
         # get embeddings of nodes in the last graph
         emb = final_emb[-1]
