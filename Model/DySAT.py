@@ -25,9 +25,9 @@ def _embedding_comm(args, x):
         torch.distributed.broadcast(comm_tensor, i, group = mp_group[i])
         if i != rank:
             result_list.append(comm_tensor)
-        # if i == rank: # send embeddings
+        if i == rank: # send embeddings
         #     # comm_tensor = x.clone().detach()
-        #     # print('rank: {} with send tensor {}'.format(rank, comm_tensor))
+            print('rank: {} with send tensor {}'.format(rank, comm_tensor))
         #     torch.distributed.broadcast(comm_tensor, i, group = mp_group[i])
         # else: # receive embeddings
         #     torch.distributed.broadcast(comm_tensor, i, group = mp_group[i])
