@@ -4,6 +4,7 @@ import torch.nn.functional as F
 
 import copy
 from torch_scatter import scatter
+from torch_geometric.utils import softmax
 
 class StructuralAttentionLayer(nn.Module):
     def __init__(self, 
@@ -51,7 +52,7 @@ class StructuralAttentionLayer(nn.Module):
         alpha = alpha_r + alpha_l
         alpha = edge_weight * alpha
         alpha = self.leaky_relu(alpha)
-        coefficients = F.softmax(alpha, edge_index[1]) # [num_edges, heads]
+        coefficients = softmax(alpha, edge_index[1]) # [num_edges, heads]
 
         # dropout
         if self.training:
