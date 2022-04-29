@@ -8,8 +8,9 @@ class Classifier(torch.nn.Module):
         self.activation2 = torch.nn.Softmax(dim=1)
         self.activation3 = torch.nn.Sigmoid()
 
-        if in_feature is not None:
-            num_feats = in_feature
+        assert in_feature, 'Unspecified number of input features'
+        
+        num_feats = in_feature
 
         self.layer_1 = torch.nn.Linear(num_feats, hidden_feature)
         self.layer_2 = torch.nn.Linear(hidden_feature, hidden_feature)

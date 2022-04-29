@@ -108,7 +108,7 @@ def run_dgnn(args):
             graphs = [graph.to(device) for graph in graphs]
             out = model(graphs, batch_x)
             loss = loss_func(out.squeeze(dim=-1), batch_y)
-            Loss.append(loss.item())
+            # Loss.append(loss.item())
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -131,7 +131,7 @@ def run_dgnn(args):
             epochs_auc.append(AUC)
             epochs_acc.append(ACC)
             print("Epoch {:<3}, Loss = {:.3f}, F1 Score {:.3f}, AUC {:.3f}, ACC {:.3f}".format(epoch,
-                                                                np.mean(Loss),
+                                                                0,
                                                                 F1_result,
                                                                 AUC,
                                                                 ACC))
