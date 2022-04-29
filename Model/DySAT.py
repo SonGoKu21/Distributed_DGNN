@@ -19,14 +19,14 @@ def _embedding_comm(args, x):
 
     result_list = []
     for i in range (world_size - 1):
+        if i > rank:
+            break
         if i == rank: # send embeddings
             comm_tensor = copy.deepcopy(x)
             torch.distributed.broadcast(comm_tensor, i, group = mp_group[i])
         else: # receive embeddings
             torch.distributed.broadcast(comm_tensor, i, group = mp_group[i])
             result_list.append(comm_tensor)
-        if i > rank:
-            break
     
     if len(result_list) > 1:
         result_list.append(x)
