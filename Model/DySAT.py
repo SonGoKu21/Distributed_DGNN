@@ -22,7 +22,7 @@ def _embedding_comm(args, x):
         if i > rank:
             break
         if i == rank: # send embeddings
-            comm_tensor = x.clone()
+            comm_tensor = x.clone().detach()
             torch.distributed.broadcast(comm_tensor, i, group = mp_group[i], async_op=True)
         else: # receive embeddings
             torch.distributed.broadcast(comm_tensor, i, group = mp_group[i], async_op=True)
