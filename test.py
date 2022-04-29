@@ -34,11 +34,11 @@ def _test_distributed(rank, args, real_dist):
     # init mp group for intermediate data exchange
     args['mp_group'] = [
         torch.distributed.new_group(
-            ranks = [i for i in range (worker + 1)
+            ranks = [i for i in range(worker)[worker:]
             ],
             backend = comm_method,
         )
-        for worker in range (world_size)
+        for worker in range (world_size - 1)
     ]
 
     # init dp group for gradients synchronization

@@ -1,6 +1,9 @@
 import copy
 import os
 import sys
+import copy
+from unittest import result
+from matplotlib.pyplot import axis
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -8,6 +11,34 @@ from torch.nn.modules.loss import BCEWithLogitsLoss
 
 from Model.layers import StructuralAttentionLayer
 from Model.layers import TemporalAttentionLayer
+
+def _embedding_comm(args, x):
+    mp_group = args['mp_group']
+    rank = args['rank']
+    world_size = args['world_size']
+
+    comm_tensor = torch.ones_like(x)
+
+    result_list = []
+    for i in range (world_size - 1):
+        if i == rank: # send embeddings
+            comm_tensor = copy.deepcopy(x)
+            torch.distributed.broadcast(comm_tensor, i, group = mp_group[i])
+        else: # receive embeddings
+            torch.distributed.broadcast(comm_tensor, i, group = mp_group[i])
+            result_list.append(comm_tensor)
+        if i > rank:
+            break
+    
+    if len(result_list) > 1:
+        result_list.append(x)
+        final = torch.cat(result_list, 1)
+        if rank == world_size - 1:
+            print(rank, final)
+        return final
+    else: return x
+
+
 
 class DySAT(nn.Module):
     def __init__(self, args, num_features):
@@ -77,8 +108,13 @@ class DySAT(nn.Module):
             structural_outputs_padded.append(padded)
         structural_outputs_padded = torch.cat(structural_outputs_padded, dim=1) # [N, T, F]
 
+        print(structural_outputs_padded)
+        # exchange node embeddings
+        fuse_structural_output = _embedding_comm(self.args, structural_outputs_padded)
+
         # Temporal Attention forward
-        temporal_out = self.temporal_attn(structural_outputs_padded)
+        if self.args['distributed']:
+            temporal_out = self.temporal_attn(structural_outputs_padded)
 
         return temporal_out
 
