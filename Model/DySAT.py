@@ -15,7 +15,7 @@ def _embedding_comm(args, x):
     rank = args['rank']
     world_size = args['world_size']
 
-    comm_tensor = torch.ones_like(x)
+    # comm_tensor = torch.ones_like(x)
 
     result_list = []
     for i in range (world_size - 1):
@@ -23,10 +23,9 @@ def _embedding_comm(args, x):
             break
         if i == rank: # send embeddings
             comm_tensor = x.clone().detach()
-            print('rank: {} with send tensor {}'.format(rank, comm_tensor))
-            torch.distributed.broadcast(comm_tensor, i, group = mp_group[i], async_op=True)
+            torch.distributed.broadcast(comm_tensor, i, group = mp_group[i])
         else: # receive embeddings
-            torch.distributed.broadcast(comm_tensor, i, group = mp_group[i], async_op=True)
+            torch.distributed.broadcast(comm_tensor, i, group = mp_group[i])
             result_list.append(comm_tensor)
     
     if len(result_list) > 0:
