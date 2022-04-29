@@ -6,7 +6,7 @@ import torch
 
 from test_function import run_dgnn_distributed, run_dgnn
 
-comm_method = 'gloo' # currently use 'gloo' for CPU process communication
+comm_method = 'nccl' # currently use 'gloo' for CPU process communication
 
 # TODO: implement the test with pytest framework
 
