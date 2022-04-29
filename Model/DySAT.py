@@ -106,7 +106,7 @@ class DySAT(nn.Module):
             structural_outputs_padded.append(padded)
         structural_outputs_padded = torch.cat(structural_outputs_padded, dim=1) # [N, T, F]
 
-        print(structural_outputs_padded)
+        print('rank: {} with tensor size {}'.format(self.args['rank'], structural_outputs_padded.size()))
         # exchange node embeddings
         fuse_structural_output = _embedding_comm(self.args, structural_outputs_padded)
 
