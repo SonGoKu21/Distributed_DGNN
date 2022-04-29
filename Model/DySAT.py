@@ -28,11 +28,10 @@ def _embedding_comm(args, x):
             torch.distributed.broadcast(comm_tensor, i, group = mp_group[i], async_op=True)
             result_list.append(comm_tensor)
     
-    if len(result_list) > 1:
+    if len(result_list) > 0:
         result_list.append(x)
         final = torch.cat(result_list, 1)
-        if rank == world_size - 1:
-            print(rank, final)
+        print('rank: {} with fused tensor size {}'.format(rank, final.size()))
         return final
     else: return x
 
