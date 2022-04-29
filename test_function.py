@@ -16,6 +16,7 @@ from sklearn.metrics import f1_score, roc_auc_score
 from torch.nn.parallel import DistributedDataParallel as DDP
 from customized_ddp import DistributedGroupedDataParallel as LocalDDP
 
+
 class _My_DGNN(torch.nn.Module):
     def __init__(self, args, in_feats = None):
         super(_My_DGNN, self).__init__()
@@ -57,6 +58,9 @@ def run_dgnn_distributed(args):
         mp_group = args['mp_group'][rank]
     else: mp_group = None
     dp_group = args['dp_group']
+
+    torch.manual_seed(42 + rank)
+    torch.cuda.manual_seed(42 + rank)
 
     # TODO: Unevenly slice graphs
     # load graphs
