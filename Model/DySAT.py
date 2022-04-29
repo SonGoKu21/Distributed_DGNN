@@ -10,35 +10,45 @@ from Model.layers import StructuralAttentionLayer
 from Model.layers import TemporalAttentionLayer
 
 class DySAT(nn.Module):
-    def __init__(self, args, num_features, time_length, sample_masks, method):
+    def __init__(self, args, num_features):
         '''
         Args:
             args: hyperparameters
             num_features: input dimension
-            time_length: total timesteps in dataset
+            time_steps: total timesteps in dataset
             sample_mask: sample different snapshot graphs
             method: adding time interval information methods
         '''
         super(DySAT, self).__init__()
+        time_steps = args['time_steps']
+        args['window'] = -1
         self.args = args
-        if args.window < 0:
-            self.num_time_steps = time_length # training graph per 'num_time_steps'
+        
+
+        if args['window'] < 0:
+            self.num_time_steps = time_steps # training graph per 'num_time_steps'
         else:
-            self.num_time_steps = min(time_length, args.window + 1)
+            self.num_time_steps = min(time_steps, args['window'] + 1)
 
         self.num_features = num_features
 
         # network setting
-        self.structural_head_config = list(map(int, args.structural_head_config.split(","))) # num of heads per layer (structural layer)
-        self.structural_layer_config = list(map(int, args.structural_layer_config.split(","))) # embedding size (structural layer)
-        self.temporal_head_config = list(map(int, args.temporal_head_config.split(","))) # num of heads per layer (temporal layer)
-        self.temporal_layer_config = list(map(int, args.temporal_layer_config.split(","))) # embedding size (temporal layer)
-        self.spatial_drop = args.spatial_drop
-        self.temporal_drop = args.temporal_drop
+        # self.structural_head_config = list(map(int, args.structural_head_config.split(","))) # num of heads per layer (structural layer)
+        # self.structural_layer_config = list(map(int, args.structural_layer_config.split(","))) # embedding size (structural layer)
+        # self.temporal_head_config = list(map(int, args.temporal_head_config.split(","))) # num of heads per layer (temporal layer)
+        # self.temporal_layer_config = list(map(int, args.temporal_layer_config.split(","))) # embedding size (temporal layer)
+        # self.spatial_drop = args.spatial_drop
+        # self.temporal_drop = args.temporal_drop
+
+        self.structural_head_config = [8]
+        self.structural_layer_config = [128]
+        self.temporal_head_config = [8]
+        self.temporal_layer_config = [128]
+        self.spatial_drop = 0.1
+        self.temporal_drop = 0.9
 
         self.n_hidden = self.temporal_layer_config[-1]
-        self.sample_masks = sample_masks
-        self.method = method
+        # self.method = method
 
         # construct layers
         self.structural_attn, self.temporal_attn = self.build_model()
@@ -82,7 +92,7 @@ class DySAT(nn.Module):
                                              n_heads=self.structural_head_config[i],
                                              attn_drop=self.spatial_drop,
                                              ffd_drop=self.spatial_drop,
-                                             residual=self.args.residual)
+                                             residual=self.args['residual'])
             structural_attention_layers.add_module(name="structural_layer_{}".format(i), module=layer)
             input_dim = self.structural_layer_config[i]
 
@@ -90,14 +100,13 @@ class DySAT(nn.Module):
         input_dim = self.structural_layer_config[-1]
         temporal_attention_layers = nn.Sequential()
         for i in range(len(self.temporal_layer_config)):
-            layer = TemporalAttentionLayer(method=self.method,
-                                           sample_masks=self.sample_masks,
+            layer = TemporalAttentionLayer(method=0,
                                            input_dim=input_dim,
                                            n_heads=self.temporal_head_config[i],
                                            num_time_steps=self.num_time_steps,
                                            attn_drop=self.temporal_drop,
-                                           residual=self.args.residual,
-                                           interval_ratio = self.args.interval_ratio)
+                                           residual=self.args['residual'],
+                                           interval_ratio = self.args['interval_ratio'])
             temporal_attention_layers.add_module(name="temporal_layer_{}".format(i), module=layer)
             input_dim = self.temporal_layer_config[i]
 

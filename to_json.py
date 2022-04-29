@@ -30,6 +30,8 @@ parser.add_argument("--model", type=str, default='DySAT',
 # TODO: Implementation has not been verified, performance may not be good.
 parser.add_argument('--residual', type=bool, nargs='?', default=True,
                     help='Use residual')
+parser.add_argument("--interval_ratio", type=int, default=0,
+                        help="num of interval to keep")               
 
 # model hyperparameters
 parser.add_argument('--learning_rate', type=float, nargs='?', default=0.001,

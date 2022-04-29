@@ -65,6 +65,9 @@ def run_dgnn_distributed(args):
 
 
 def run_dgnn(args):
+    r"""
+    run dgnn with one process
+    """
     device = args['device']
 
     # TODO: Unevenly slice graphs
@@ -138,7 +141,6 @@ def run_dgnn(args):
                                                                 ACC))
 
     # print the training result info
-
     best_f1_epoch = epochs_f1_score.index(max(epochs_f1_score))
     best_auc_epoch = epochs_auc.index(max(epochs_auc))
     best_acc_epoch = epochs_acc.index(max(epochs_acc))

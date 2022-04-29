@@ -71,7 +71,7 @@ class StructuralAttentionLayer(nn.Module):
 class TemporalAttentionLayer(nn.Module):
     def __init__(self,
                 method,
-                sample_masks,
+                # sample_masks,
                 input_dim,
                 n_heads,
                 num_time_steps,
@@ -82,7 +82,7 @@ class TemporalAttentionLayer(nn.Module):
         self.n_heads = n_heads
         self.num_time_steps = num_time_steps
         self.residual = residual
-        self.sample_masks = sample_masks
+        # self.sample_masks = sample_masks
         self.method = method
         self.interval_ratio = interval_ratio
 
@@ -118,99 +118,15 @@ class TemporalAttentionLayer(nn.Module):
         outputs = torch.matmul(q_, k_.permute(0,2,1)) # [hN, T, T]
         outputs = outputs / (self.num_time_steps ** 0.5)
 
-        if self.method == 1:
-            sample_masks = self.sample_masks[:self.num_time_steps]
-            Time_interval = torch.ones_like(outputs[0]) # [T, T]
-            Time_numpy = Time_interval.numpy()
-            for i in range (Time_numpy.shape[0]):
-                for j in range (Time_numpy.shape[1]):
-                    if i > j:
-                        Time_numpy[i,j] = float(sample_masks[i] - sample_masks[j])
-            Time_information = torch.tensor(Time_numpy)
-            outputs = torch.div(outputs, Time_information)
-
-        elif self.method == 2:
-            sample_masks =  self.sample_masks[:self.num_time_steps]
-            Time_interval = torch.ones_like(outputs[0])
-            Time_numpy = Time_interval.numpy()
-            for i in range (Time_numpy.shape[0]):
-                for j in range (Time_numpy.shape[1]):
-                    Time_numpy[i,j] = float(sample_masks[i] - sample_masks[j])
-            Time_information = torch.tensor(Time_numpy)
-            Time_mask = torch.matmul(Time_information, self.time_weights)  # [T, T]
-            Time_mask = torch.tile(Time_mask)[None, :, :].repeat(outputs.shape[0], 1, 1)  # [h*N, T, T]
-            outputs = outputs + Time_mask
-
-        elif self.method == 3:
-            sample_masks =  self.sample_masks[:self.num_time_steps]
-            Time_interval = torch.ones_like(outputs[0, :, :])
-            interval_sum = []
-            for i in range (self.num_time_steps):
-                temp = 0
-                for j in range (self.num_time_steps):
-                    if i > j:
-                        temp += sample_masks[i] - sample_masks[j]
-                interval_sum.append(temp)
-            Time_numpy = Time_interval.numpy()
-            for i in range (Time_numpy.shape[0]):
-                for j in range (Time_numpy.shape[0]):
-                    if i > j:
-                        Time_numpy[i,j] = float(sample_masks[i] - sample_masks[j])/float(interval_sum[i])
-            Time_information = torch.tensor(Time_numpy)
-            outputs = torch.div(outputs, Time_information)
-
-        elif self.method == 4:
-            sample_masks =  self.sample_masks[:self.num_time_steps]
-            Time_interval = torch.ones_like(outputs[0, :, :])
-            interval_sum = []
-            for i in range (self.num_time_steps):
-                temp = 0
-                for j in range (self.num_time_steps):
-                    if i > j:
-                        temp += sample_masks[i] - sample_masks[j]
-                #     interval_temp.append(temp)
-                interval_sum.append(temp)
-            Time_numpy = Time_interval.numpy()
-            for i in range (Time_numpy.shape[0]):
-                for j in range (Time_numpy.shape[1]):
-                    if i > j:
-                        Time_numpy[i,j] = float(sample_masks[i] - sample_masks[j])/float(interval_sum[i])
-            Time_information = torch.tensor(Time_numpy)
-            Time_mask = torch.matmul(Time_information, self.time_weights)
-            Time_mask = torch.tile(Time_mask)[None, :, :].repeat(outputs.shape[0], 1, 1)
-            outputs = outputs + Time_mask
-
-        elif self.method == 5:
-            sample_masks =  self.sample_masks[:self.num_time_steps]
-            Time_interval = torch.ones_like(outputs[0, :, :])
-            interval_sum = []
-            for i in range (self.num_time_steps):
-                temp = 0
-                for j in range (self.num_time_steps):
-                    if i > j:
-                        temp += sample_masks[i] - sample_masks[j]
-                #     interval_temp.append(temp)
-                interval_sum.append(temp)
-            print(interval_sum)
-            Time_numpy = Time_interval.numpy()
-            for i in range (Time_numpy.shape[0]):
-                for j in range (Time_numpy.shape[0]):
-                    if i > j:
-                        Time_numpy[i,j] = float(sample_masks[i] - sample_masks[j])/float(interval_sum[i])
-                # sigmoid
-                torch.math.sigmoid(Time_numpy[i])
-            # print(Time_numpy)
-            Time_information = torch.tensor(Time_numpy)
-            outputs = torch.div(outputs, Time_information)
-
         # reduced time interval information
-        sample_masks =  self.sample_masks[:self.num_time_steps]
+        # sample_masks =  self.sample_masks[:self.num_time_steps]
+        time_interval = [i for i in range(self.num_time_steps)]
         Time_interval = torch.ones_like(outputs[0])
         Time_numpy = Time_interval.cpu().numpy()
         for i in range (Time_numpy.shape[0]):
             for j in range (Time_numpy.shape[1]):
                 if i > j:
-                    Time_numpy[i,j] = float(sample_masks[i] - sample_masks[j])
+                    Time_numpy[i,j] = float(time_interval[i] - time_interval[j])
                     # # Additional 3 (method 3): do not work!
                     # Time_interval[i][j] = Time_interval[i][j]*self.ti
         # print(Time_numpy)
