@@ -33,7 +33,9 @@ def _embedding_comm(args, x):
         final = torch.cat(result_list, 1)
         print('rank: {} with fused tensor size {}'.format(rank, final.size()))
         return final
-    else: return x
+    else: final = x.clone()
+
+    return final
 
 
 
