@@ -133,7 +133,7 @@ def run_dgnn(args):
             epochs_auc.append(AUC)
             epochs_acc.append(ACC)
             print("Epoch {:<3}, Loss = {:.3f}, F1 Score {:.3f}, AUC {:.3f}, ACC {:.3f}".format(epoch,
-                                                                0,
+                                                                np.mean(Loss),
                                                                 F1_result,
                                                                 AUC,
                                                                 ACC))
