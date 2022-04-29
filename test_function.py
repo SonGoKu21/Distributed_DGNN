@@ -113,6 +113,10 @@ def run_dgnn_distributed(args):
             optimizer.step()
         # print(out)
         # test
+        if epoch % args['test_freq'] == 0 and rank != world_size - 1:
+            graphs = [graph.to(device) for graph in graphs]
+            test_result = model(graphs, torch.tensor(dataset['test_data']).to(device))
+
         if epoch % args['test_freq'] == 0 and rank == world_size - 1:
             # test_source_id = test_data[:, 0]
             # test_target_id = test_data[:, 1]
