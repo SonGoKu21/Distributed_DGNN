@@ -49,7 +49,7 @@ class DySAT(nn.Module):
             method: adding time interval information methods
         '''
         super(DySAT, self).__init__()
-        time_steps = args['time_steps']
+        time_steps = args['local_time_steps']
         args['window'] = -1
         self.args = args
         
