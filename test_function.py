@@ -13,7 +13,7 @@ from Model.DySAT import DySAT
 from Model.MLP import Classifier
 from sklearn.metrics import f1_score, roc_auc_score
 
-class _My_DGNN():
+class _My_DGNN(torch.nn.Module):
     def __init__(self, args, in_feats = None):
         super(_My_DGNN, self).__init__()
         self.dgnn = DySAT(args, num_features = in_feats)
