@@ -32,9 +32,10 @@ def _test_distributed(rank, args, real_dist):
                                         )
 
     # init mp group for intermediate data exchange
+    group_idx = range(world_size)
     args['mp_group'] = [
         torch.distributed.new_group(
-            ranks = [i for i in range(worker)[worker:]
+            ranks = [i for i in group_idx[worker:]
             ],
             backend = comm_method,
         )
