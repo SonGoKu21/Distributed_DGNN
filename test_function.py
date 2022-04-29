@@ -22,7 +22,7 @@ class _My_DGNN(torch.nn.Module):
         final_emb = self.dgnn(graphs)
         # print(nids)
         # get embeddings of nodes in the last graph
-        emb = final_emb[-1]
+        emb = final_emb[:, -1, :]
 
         # get target embeddings
         source_id = nids[:, 0]
