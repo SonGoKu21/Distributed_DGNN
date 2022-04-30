@@ -17,7 +17,7 @@ def _test_distributed(rank, args, real_dist):
         device = torch.cuda.set_device(rank)
         args['device'] = device
     else:  
-        device = torch.device("cuda")
+        device = torch.device("cpu")
         args['device'] = device
 
     # init the communication group
