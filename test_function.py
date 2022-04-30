@@ -169,7 +169,7 @@ def run_dgnn(args):
     """
     args['distributed'] = False
     device = args['device']
-    args['time_steps'] = 4
+    # args['time_steps'] = 4
 
     # TODO: Unevenly slice graphs
     # load graphs
