@@ -113,12 +113,14 @@ class DySAT(nn.Module):
         structural_outputs_padded = torch.cat(structural_outputs_padded, dim=1) # [N, T, F]
 
         # print('rank: {} with tensor size {}'.format(self.args['rank'], structural_outputs_padded.size()))
-        # exchange node embeddings
-        fuse_structural_output = _embedding_comm(self.args, structural_outputs_padded)
 
         # Temporal Attention forward
         if self.args['distributed']:
-            temporal_out = self.temporal_attn(structural_outputs_padded)
+            # exchange node embeddings
+            fuse_structural_output = _embedding_comm(self.args, structural_outputs_padded)
+            temporal_out = self.temporal_attn(fuse_structural_output)
+        else: temporal_out = self.temporal_attn(structural_outputs_padded)
+
 
         return temporal_out
 
