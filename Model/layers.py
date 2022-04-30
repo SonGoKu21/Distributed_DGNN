@@ -89,7 +89,7 @@ class TemporalAttentionLayer(nn.Module):
 
         # define weights
         self.position_embeddings = nn.Parameter(torch.Tensor(num_time_steps, input_dim))
-        self.time_weights = nn.Parameter(torch.Tensor(num_time_steps, num_time_steps))
+        # self.time_weights = nn.Parameter(torch.Tensor(num_time_steps, num_time_steps))
         self.Q_embedding_weights = nn.Parameter(torch.Tensor(input_dim, input_dim))
         self.K_embedding_weights = nn.Parameter(torch.Tensor(input_dim, input_dim))
         self.V_embedding_weights = nn.Parameter(torch.Tensor(input_dim, input_dim))
