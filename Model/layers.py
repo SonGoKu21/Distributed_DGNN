@@ -104,11 +104,11 @@ class TemporalAttentionLayer(nn.Module):
         """In:  attn_outputs (of StructuralAttentionLayer at each snapshot):= [N, T, F]"""
         # 1: Add position embeddings to input
         position_inputs = torch.arange(0,self.num_time_steps).reshape(1, -1).repeat(inputs.shape[0], 1).long().to(inputs.device)
-        temporal_inputs = inputs + self.position_embeddings[position_inputs] # [N, T, F
+        temporal_inputs = inputs + self.position_embeddings[position_inputs] # [N, T, F]
 
-        position_temp = torch.tensor([[j for i in range(self.input_dim)]for j in range (self.num_time_steps)])
-        extend_tensor = torch.zeros(inputs.shape[0], position_temp.shape[0], position_temp.shape[1])
-        position_extend = position_temp.expand_as(extend_tensor).float().to(inputs.device)
+        # position_temp = torch.tensor([[j for i in range(self.input_dim)]for j in range (self.num_time_steps)])
+        # extend_tensor = torch.zeros(inputs.shape[0], position_temp.shape[0], position_temp.shape[1])
+        # position_extend = position_temp.expand_as(extend_tensor).float().to(inputs.device)
         # print(position_extend.type())
         # print(self.position_embeddings.type())
         # temporal_inputs = inputs + torch.tensordot(position_extend, self.position_embeddings, dims=([2],[0]))
