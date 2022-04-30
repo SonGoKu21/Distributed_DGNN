@@ -4,7 +4,7 @@ import json
 parser = argparse.ArgumentParser()
 parser.add_argument('--time_steps', type=int, nargs='?', default=8,
                     help="total time steps used for train, eval and test")
-parser.add_argument('--dataset', type=str, nargs='?', default='Enron',
+parser.add_argument('--dataset', type=str, nargs='?', default='Epinion',
                     help='dataset name')
 
 # Experimental settings.
