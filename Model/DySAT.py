@@ -19,8 +19,8 @@ def _embedding_comm(args, x):
     comm_tensor = x.clone().detach()
     
     result_list = []
-    args['comm_cost'] = 0
-    comm_start_time = time.time()
+    # args['comm_cost'] = 0
+    # comm_start_time = time.time()
     for i in range (world_size - 1):
         if i > rank:
             break
@@ -32,8 +32,8 @@ def _embedding_comm(args, x):
         # else:
         #     # log the communication cost (send embeddings)
         #     # args['comm_cost'] = time.time() - comm_start_time
-    args['comm_cost'] += time.time() - comm_start_time
-    print('comm_cost in worker {} with time {}'.format(rank, args['comm_cost']))
+    # args['comm_cost'] += time.time() - comm_start_time
+    # print('comm_cost in worker {} with time {}'.format(rank, args['comm_cost']))
     if len(result_list) > 0:
         result_list.append(x)
         final = torch.cat(result_list, 1)
@@ -117,8 +117,12 @@ class DySAT(nn.Module):
 
         # Temporal Attention forward
         if self.args['distributed']:
+            self.args['comm_cost'] = 0
+            comm_start = time.time()
             # exchange node embeddings
             fuse_structural_output = _embedding_comm(self.args, structural_outputs_padded)
+            self.args['comm_cost'] += time.time() - comm_start
+            print('comm_cost in worker {} with time {}'.format(self.args['rank'], self.args['comm_cost']))
             temporal_out = self.temporal_attn(fuse_structural_output)
         else: temporal_out = self.temporal_attn(structural_outputs_padded)
 
