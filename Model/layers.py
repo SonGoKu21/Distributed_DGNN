@@ -108,6 +108,7 @@ class TemporalAttentionLayer(nn.Module):
         position_temp = torch.tensor([[j for i in range(self.input_dim)]for j in range (self.num_time_steps)])
         extend_tensor = torch.zeros(inputs.shape[0], position_temp.shape[0], position_temp.shape[1])
         position_extend = position_temp.expand_as(extend_tensor)
+        print(position_extend.size())
         temporal_inputs = inputs + self.position_embeddings[position_extend]
 
         # 2: Query, Key based multi-head self attention.
