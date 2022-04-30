@@ -10,7 +10,7 @@ parser.add_argument('--dataset', type=str, nargs='?', default='Enron',
 # Experimental settings.
 parser.add_argument('--world_size', type=int, nargs='?', default=2,
                     help='distributed scale')
-parser.add_argument('--epochs', type=int, nargs='?', default=200,
+parser.add_argument('--epochs', type=int, nargs='?', default=100,
                     help='# epochs')
 parser.add_argument('--val_freq', type=int, nargs='?', default=1,
                     help='Validation frequency (in epochs)')
