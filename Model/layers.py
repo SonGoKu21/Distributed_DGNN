@@ -110,7 +110,8 @@ class TemporalAttentionLayer(nn.Module):
         position_extend = position_temp.expand_as(extend_tensor).float().to(inputs.device)
         # print(position_extend.type())
         # print(self.position_embeddings.type())
-        temporal_inputs = inputs + torch.tensordot(position_extend, self.position_embeddings, dims=([2],[0]))
+        # temporal_inputs = inputs + torch.tensordot(position_extend, self.position_embeddings, dims=([2],[0]))
+        temporal_inputs = inputs
 
         # 2: Query, Key based multi-head self attention.
         q = torch.tensordot(temporal_inputs, self.Q_embedding_weights, dims=([2],[0])) # [N, T, F]
