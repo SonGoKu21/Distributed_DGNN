@@ -169,6 +169,8 @@ def run_dgnn(args):
     """
     args['distributed'] = False
     device = args['device']
+    args['structural_time_steps'] = num_graph
+    args['temporal_time_steps'] = num_graph
 
     # TODO: Unevenly slice graphs
     # load graphs
