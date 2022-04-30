@@ -120,7 +120,9 @@ def run_dgnn_distributed(args):
             loss.backward()
             optimizer.step()
             epoch_train_time.append(time.time() - train_start_time)
-            epoch_comm_time.append(args['comm_cost'])
+            if args['distributed']:
+                epoch_comm_time.append(args['comm_cost'])
+            else: epoch_comm_time.append(0)
         # print(out)
         # test
         if epoch % args['test_freq'] == 0 and rank != world_size - 1:
