@@ -19,6 +19,7 @@ def _embedding_comm(args, x):
     comm_tensor = x.clone().detach()
     
     result_list = []
+    args['comm_cost'] = 0
     for i in range (world_size - 1):
         if i > rank:
             break
@@ -26,7 +27,7 @@ def _embedding_comm(args, x):
         torch.distributed.broadcast(comm_tensor, i, group = mp_group[i])
         if i != rank:
             result_list.append(comm_tensor)
-            args['comm_cost'] = None
+            args['comm_cost'] += time.time() - comm_start_time
         else:
             # log the communication cost (send embeddings)
             args['comm_cost'] = time.time() - comm_start_time
