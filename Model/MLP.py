@@ -16,7 +16,7 @@ class Classifier(torch.nn.Module):
         self.layer_2 = torch.nn.Linear(hidden_feature, hidden_feature)
         self.layer_3 = torch.nn.Linear(hidden_feature, out_feature)
 
-        # self.norm = nn.BatchNorm1d(hidden_feature)
+        self.norm = nn.BatchNorm1d(hidden_feature)
 
         # init the layer
         nn.init.xavier_uniform_(self.layer_1.weight)
