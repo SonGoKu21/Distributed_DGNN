@@ -32,6 +32,7 @@ def _embedding_comm(args, x):
             # log the communication cost (send embeddings)
             args['comm_cost'] = time.time() - comm_start_time
     
+    print('comm_cost in worker {} with time {}'.format(rank, args['comm_cost']))
     if len(result_list) > 0:
         result_list.append(x)
         final = torch.cat(result_list, 1)
