@@ -91,7 +91,7 @@ def run_dgnn_distributed(args):
     model = _My_DGNN(args, in_feats=load_feats[0].shape[1]).to(device)
     model.set_comm()
     # model = LocalDDP(copy.deepcopy(model), mp_group, dp_group, world_size)
-    model = DDP(model, process_group=dp_group, find_unused_parameters=True)
+    # model = DDP(model, process_group=dp_group, find_unused_parameters=True)
 
     # loss_func = nn.BCELoss()
     loss_func = nn.CrossEntropyLoss()
@@ -131,7 +131,7 @@ def run_dgnn_distributed(args):
             test_result = model(graphs, torch.tensor(dataset['test_data']).to(device))
 
         if epoch % args['test_freq'] == 0 and rank == world_size - 1:
-            # model.eval()
+            model.eval()
             graphs = [graph.to(device) for graph in graphs]
             test_result = model(graphs, torch.tensor(dataset['test_data']).to(device))
             prob_f1 = []
