@@ -86,9 +86,10 @@ class TemporalAttentionLayer(nn.Module):
         # self.sample_masks = sample_masks
         self.method = method
         self.interval_ratio = interval_ratio
+        self.input_dim = input_dim
 
         # define weights
-        self.position_embeddings = nn.Parameter(torch.Tensor(num_time_steps, input_dim))
+        self.position_embeddings = nn.Parameter(torch.Tensor(input_dim, input_dim))
         # self.time_weights = nn.Parameter(torch.Tensor(num_time_steps, num_time_steps))
         self.Q_embedding_weights = nn.Parameter(torch.Tensor(input_dim, input_dim))
         self.K_embedding_weights = nn.Parameter(torch.Tensor(input_dim, input_dim))
@@ -102,8 +103,12 @@ class TemporalAttentionLayer(nn.Module):
     def forward(self, inputs):
         """In:  attn_outputs (of StructuralAttentionLayer at each snapshot):= [N, T, F]"""
         # 1: Add position embeddings to input
-        position_inputs = torch.arange(0,self.num_time_steps).reshape(1, -1).repeat(inputs.shape[0], 1).long().to(inputs.device)
-        temporal_inputs = inputs + self.position_embeddings[position_inputs] # [N, T, F]
+        # position_inputs = torch.arange(0,self.num_time_steps).reshape(1, -1).repeat(inputs.shape[0], 1).long().to(inputs.device)
+        # temporal_inputs = inputs + self.position_embeddings[position_inputs] # [N, T, F]
+        position_temp = torch.tensor([[j for i in range(self.input_dim)]for j in range (self.num_time_steps)])
+        extend_tensor = torch.zeros(inputs.shape[0], position_temp.shape[0], position_temp.shape[1])
+        position_extend = position_temp.expand_as(extend_tensor)
+        temporal_inputs = inputs + self.position_embeddings[position_extend]
 
         # 2: Query, Key based multi-head self attention.
         q = torch.tensordot(temporal_inputs, self.Q_embedding_weights, dims=([2],[0])) # [N, T, F]
