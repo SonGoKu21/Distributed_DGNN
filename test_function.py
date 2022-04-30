@@ -143,7 +143,7 @@ def run_dgnn_distributed(args):
             epochs_acc.append(ACC)
             print("Epoch {:<3}, Time = {}|{}({}%), Loss = {:.3f}, F1 Score = {:.3f}, AUC = {:.3f}, ACC = {:.3f}".format(epoch,
                                                                 np.sum(epoch_train_time), np.sum(epoch_comm_time),
-                                                                (np.sum(epoch_comm_time)/np.sum(epoch_train_time))*100
+                                                                (np.sum(epoch_comm_time)/np.sum(epoch_train_time))*100,
                                                                 np.mean(Loss),
                                                                 F1_result,
                                                                 AUC,
