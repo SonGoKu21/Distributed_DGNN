@@ -3,6 +3,7 @@ import torch
 import torch.utils.data as Data
 import torch.nn as nn
 import copy
+import time
 
 from data_process import load_graphs
 from data_process import get_data_example
@@ -103,10 +104,13 @@ def run_dgnn_distributed(args):
     # train
     for epoch in range (args['epochs']):
         Loss = []
+        epoch_train_time = []
+        epoch_comm_time = []
         for step, (batch_x, batch_y) in enumerate(loader):
             model.train()
             batch_x = batch_x.to(device)
             batch_y = batch_y.to(device)
+            train_start_time = time.time()
             graphs = [graph.to(device) for graph in graphs]
             out = model(graphs, batch_x)
             # print(out)
@@ -115,6 +119,8 @@ def run_dgnn_distributed(args):
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+            epoch_train_time.append(time.time() - train_start_time)
+            epoch_comm_time.append(args['comm_cost'])
         # print(out)
         # test
         if epoch % args['test_freq'] == 0 and rank != world_size - 1:
@@ -122,8 +128,6 @@ def run_dgnn_distributed(args):
             test_result = model(graphs, torch.tensor(dataset['test_data']).to(device))
 
         if epoch % args['test_freq'] == 0 and rank == world_size - 1:
-            # test_source_id = test_data[:, 0]
-            # test_target_id = test_data[:, 1]
             model.eval()
             graphs = [graph.to(device) for graph in graphs]
             test_result = model(graphs, torch.tensor(dataset['test_data']).to(device))
@@ -137,7 +141,9 @@ def run_dgnn_distributed(args):
             epochs_f1_score.append(F1_result)
             epochs_auc.append(AUC)
             epochs_acc.append(ACC)
-            print("Epoch {:<3}, Loss = {:.3f}, F1 Score {:.3f}, AUC {:.3f}, ACC {:.3f}".format(epoch,
+            print("Epoch {:<3}, Time = {}|{}({}%), Loss = {:.3f}, F1 Score = {:.3f}, AUC = {:.3f}, ACC = {:.3f}".format(epoch,
+                                                                np.sum(epoch_train_time), np.sum(epoch_comm_time),
+                                                                (np.sum(epoch_comm_time)/np.sum(epoch_train_time))*100
                                                                 np.mean(Loss),
                                                                 F1_result,
                                                                 AUC,

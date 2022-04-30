@@ -3,6 +3,7 @@ import os
 import sys
 import copy
 import torch
+import time
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.modules.loss import BCEWithLogitsLoss
@@ -21,9 +22,14 @@ def _embedding_comm(args, x):
     for i in range (world_size - 1):
         if i > rank:
             break
+        comm_start_time = time.time()
         torch.distributed.broadcast(comm_tensor, i, group = mp_group[i])
         if i != rank:
             result_list.append(comm_tensor)
+            args['comm_cost'] = None
+        else:
+            # log the communication cost (send embeddings)
+            args['comm_cost'] = time.time() - comm_start_time
     
     if len(result_list) > 0:
         result_list.append(x)
