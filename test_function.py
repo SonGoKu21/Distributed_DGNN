@@ -226,7 +226,7 @@ def run_dgnn(args):
         if epoch % args['test_freq'] == 0:
             # test_source_id = test_data[:, 0]
             # test_target_id = test_data[:, 1]
-            model.eval()
+            # model.eval()
             graphs = [graph.to(device) for graph in graphs]
             test_result = model(graphs, torch.tensor(dataset['test_data']).to(device))
             prob_f1 = []
