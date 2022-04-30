@@ -67,7 +67,8 @@ def run_dgnn_distributed(args):
     # load graphs
     load_g, load_adj, load_feats = slice_graph(*load_graphs(args))
     num_graph = len(load_g)
-    args['local_time_steps'] = num_graph
+    args['structural_time_steps'] = num_graph
+    args['temporal_time_steps'] = num_graph*(rank + 1)
     print("Loaded {}/{} graphs".format(num_graph, args['time_steps']))
 
     dataset = load_dataset(*get_data_example(load_g, args, num_graph))

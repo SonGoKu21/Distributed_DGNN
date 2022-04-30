@@ -55,16 +55,17 @@ class DySAT(nn.Module):
             method: adding time interval information methods
         '''
         super(DySAT, self).__init__()
-        time_steps = args['local_time_steps']
+        structural_time_steps = args['structural_time_steps']
+        temporal_time_steps = args['temporal_time_steps']
         args['window'] = -1
         self.args = args
         
 
         if args['window'] < 0:
-            self.num_time_steps = time_steps # training graph per 'num_time_steps'
+            self.structural_time_steps = structural_time_steps # training graph per 'num_time_steps'
         else:
-            self.num_time_steps = min(time_steps, args['window'] + 1)
-
+            self.structural_time_steps = min(structural_time_steps, args['window'] + 1)
+        self.temporal_time_steps = temporal_time_steps
         self.num_features = num_features
 
         # network setting
@@ -98,7 +99,7 @@ class DySAT(nn.Module):
 
         # Structural Attention forward
         structural_out = []
-        for t in range(0, self.num_time_steps):
+        for t in range(0, self.structural_time_steps):
             structural_out.append(self.structural_attn(graphs[t]))
         structural_outputs = [g.x[:,None,:] for g in structural_out] # list of [Ni, 1, F]
 
@@ -146,7 +147,7 @@ class DySAT(nn.Module):
             layer = TemporalAttentionLayer(method=0,
                                            input_dim=input_dim,
                                            n_heads=self.temporal_head_config[i],
-                                           num_time_steps=self.num_time_steps,
+                                           num_time_steps=self.temporal_time_steps,
                                            attn_drop=self.temporal_drop,
                                            residual=self.args['residual'],
                                            interval_ratio = self.args['interval_ratio'])
