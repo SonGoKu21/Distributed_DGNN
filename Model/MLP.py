@@ -28,11 +28,11 @@ class Classifier(torch.nn.Module):
 
     def forward(self, x):
         x = self.layer_1(x)
-        # x = self.norm(x)
+        x = self.norm(x)
         x = self.activation3(x)
 
         x = self.layer_2(x)
-        # x = self.norm(x)
+        x = self.norm(x)
         x = self.activation3(x)
 
         x = self.layer_3(x)
