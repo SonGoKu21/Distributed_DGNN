@@ -20,19 +20,20 @@ def _embedding_comm(args, x):
     
     result_list = []
     args['comm_cost'] = 0
+    comm_start_time = time.time()
     for i in range (world_size - 1):
         if i > rank:
             break
-        comm_start_time = time.time()
+        # comm_start_time = time.time()
         torch.distributed.broadcast(comm_tensor, i, group = mp_group[i])
         if i != rank:
             result_list.append(comm_tensor)
-            args['comm_cost'] += time.time() - comm_start_time
-        else:
-            # log the communication cost (send embeddings)
-            args['comm_cost'] = time.time() - comm_start_time
-    
-    print('comm_cost in worker {} with time {}'.format(rank, args['comm_cost']))
+            # args['comm_cost'] += time.time() - comm_start_time
+        # else:
+        #     # log the communication cost (send embeddings)
+        #     # args['comm_cost'] = time.time() - comm_start_time
+    args['comm_cost'] += time.time() - comm_start_time
+    # print('comm_cost in worker {} with time {}'.format(rank, args['comm_cost']))
     if len(result_list) > 0:
         result_list.append(x)
         final = torch.cat(result_list, 1)
@@ -111,7 +112,7 @@ class DySAT(nn.Module):
             structural_outputs_padded.append(padded)
         structural_outputs_padded = torch.cat(structural_outputs_padded, dim=1) # [N, T, F]
 
-        print('rank: {} with tensor size {}'.format(self.args['rank'], structural_outputs_padded.size()))
+        # print('rank: {} with tensor size {}'.format(self.args['rank'], structural_outputs_padded.size()))
         # exchange node embeddings
         fuse_structural_output = _embedding_comm(self.args, structural_outputs_padded)
 
