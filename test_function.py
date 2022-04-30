@@ -169,14 +169,14 @@ def run_dgnn(args):
     """
     args['distributed'] = False
     device = args['device']
-    args['structural_time_steps'] = num_graph
-    args['temporal_time_steps'] = num_graph
 
     # TODO: Unevenly slice graphs
     # load graphs
     load_g, load_adj, load_feats = slice_graph(*load_graphs(args))
     num_graph = len(load_g)
     print("Loaded {}/{} graphs".format(num_graph, args['time_steps']))
+    args['structural_time_steps'] = num_graph
+    args['temporal_time_steps'] = num_graph
 
     dataset = load_dataset(*get_data_example(load_g, args, num_graph))
 
