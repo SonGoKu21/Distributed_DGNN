@@ -51,7 +51,7 @@ class _My_DGNN(torch.nn.Module):
 
 # TODO: complete the global forward
 def run_dgnn_distributed(args):
-    args['distributed'] = True
+    args['distributed'] = False
     device = args['device']
     rank = args['rank']
     world_size = args['world_size']
