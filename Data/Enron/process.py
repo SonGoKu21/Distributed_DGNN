@@ -67,8 +67,8 @@ if __name__ == "__main__":
 
     # split edges 
     SLICE_MONTHS = 30
-    START_DATE = min(ts) + timedelta(200)
-    END_DATE = max(ts) - timedelta(200)
+    START_DATE = min(ts) + timedelta(100)
+    END_DATE = max(ts) - timedelta(100)
     print("Spliting Time Interval: \n Start Time : {}, End Time : {}".format(START_DATE, END_DATE))
 
     slice_links = defaultdict(lambda: nx.MultiGraph())
