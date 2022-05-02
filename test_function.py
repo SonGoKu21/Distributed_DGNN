@@ -92,7 +92,7 @@ def run_dgnn_distributed(args):
     model.set_comm()
     # model = LocalDDP(copy.deepcopy(model), mp_group, dp_group, world_size)
     print('worker {} already put the model to device {}'.format(rank, args['device']))
-    # model = DDP(model, process_group=dp_group)
+    model = DDP(model, process_group=dp_group)
 
     # loss_func = nn.BCELoss()
     loss_func = nn.CrossEntropyLoss()
