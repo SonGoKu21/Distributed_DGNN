@@ -2,6 +2,7 @@
 from collections import defaultdict
 from datetime import datetime, timedelta
 import os
+import re
 
 current_path = os.getcwd()
 
@@ -22,7 +23,8 @@ with open(file_path) as f:
         if l[0] == '%':
             continue
 
-        x, y, e, t = map(int, l.split(' '))
+        # x, y, e, t = map(int, l.split(' '))
+        x, y, e, t = map(int, re.split(r"[ ]+", l))
         # print (x,y,e,t)
         timestamp = datetime.fromtimestamp(t)
         ts.append(timestamp)
