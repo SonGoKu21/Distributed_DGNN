@@ -119,7 +119,7 @@ def load_graphs(args):
             graphs = pkl.load(f)
     else:
         graphs = np.load(graph_path, allow_pickle=True, encoding='latin1')['graph']
-    graphs = graphs[:time_steps]
+    graphs = graphs[1:time_steps]
     adj_matrices = list(map(lambda x: nx.adjacency_matrix(x), graphs))
     # print("Loaded {} graphs ".format(len(graphs)))
 
