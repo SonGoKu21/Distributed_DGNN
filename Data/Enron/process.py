@@ -27,7 +27,7 @@ def getDateTimeFromISO8601String(s):
 if __name__ == "__main__":
 
     node_data = defaultdict(lambda : ())  
-    with open(current_path + '/Data/Enron/vis.graph.nodeList.json') as f:
+    with open(current_path + '/vis.graph.nodeList.json') as f:
         for chunk in lines_per_n(f, 5):
             chunk = chunk.split("\n")
             id_string = chunk[1].split(":")[1]
@@ -48,7 +48,7 @@ if __name__ == "__main__":
 
     links = []
     ts = []
-    with open(current_path + '/Data/Enron/vis.digraph.allEdges.json') as f:
+    with open(current_path + '/vis.digraph.allEdges.json') as f:
         for chunk in lines_per_n(f, 5):
             chunk = chunk.split("\n")
             
