@@ -33,7 +33,7 @@ def _test_distributed(rank, args, real_dist):
         if args['rank'] == 0:
             device = torch.device("cpu")
         else:
-            device = torch.device("cpu")
+            device = torch.device("cuda")
         # torch.cuda.set_device(local_rank)
         # device = torch.device("cuda", local_rank)
         args['device'] = device
