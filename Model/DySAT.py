@@ -16,7 +16,7 @@ def _embedding_comm(args, x):
     rank = args['rank']
     world_size = args['world_size']
 
-    comm_tensor = x.clone()
+    comm_tensor = x.clone().detach()
     
     result_list = []
     for i in range (world_size - 1):
