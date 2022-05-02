@@ -86,8 +86,8 @@ def _test_dp(args):
 def _test_ddp(args):
     torch.multiprocessing.set_start_method('spawn')
     world_size = args['world_size']
-    assert torch.cuda.device_count() >= world_size,\
-        'No enough GPU!'
+    # assert torch.cuda.device_count() >= world_size,\
+    #     'No enough GPU!'
     real_dist = True
 
     workers = []
