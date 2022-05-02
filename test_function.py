@@ -91,6 +91,7 @@ def run_dgnn_distributed(args):
     model = _My_DGNN(args, in_feats=load_feats[0].shape[1]).to(device)
     model.set_comm()
     # model = LocalDDP(copy.deepcopy(model), mp_group, dp_group, world_size)
+    print('worker {} already put the model to device {}'.format(rank, args['data_str']))
     model = DDP(model, process_group=dp_group)
 
     # loss_func = nn.BCELoss()
@@ -136,22 +137,21 @@ def run_dgnn_distributed(args):
             test_result = model(graphs, torch.tensor(dataset['test_data']).to(device))
             prob_f1 = []
             prob_auc = []
-            # prob_f1.extend(np.argmax(test_result.detach().cpu().numpy(), axis = 1))
-            # prob_auc.extend(test_result[:, -1].detach().cpu().numpy())
-            # ACC = sum(prob_f1 == dataset['test_labels'])/len(dataset['test_labels'])
-            # F1_result = f1_score(dataset['test_labels'], prob_f1)
-            # AUC = roc_auc_score(dataset['test_labels'], prob_auc)
-            # epochs_f1_score.append(F1_result)
-            # epochs_auc.append(AUC)
-            # epochs_acc.append(ACC)
+            prob_f1.extend(np.argmax(test_result.detach().cpu().numpy(), axis = 1))
+            prob_auc.extend(test_result[:, -1].detach().cpu().numpy())
+            ACC = sum(prob_f1 == dataset['test_labels'])/len(dataset['test_labels'])
+            F1_result = f1_score(dataset['test_labels'], prob_f1)
+            AUC = roc_auc_score(dataset['test_labels'], prob_auc)
+            epochs_f1_score.append(F1_result)
+            epochs_auc.append(AUC)
+            epochs_acc.append(ACC)
             print("Epoch {:<3}, Time = {:.5f}|{:.5f}({:.3f}%), Loss = {:.3f}, F1 Score = {:.3f}, AUC = {:.3f}, ACC = {:.3f}".format(epoch,
                                                                 np.sum(epoch_train_time), np.sum(epoch_comm_time),
                                                                 (np.sum(epoch_comm_time)/np.sum(epoch_train_time))*100,
                                                                 np.mean(Loss),
-                                                                0,0,0
-                                                                # F1_result,
-                                                                # AUC,
-                                                                # ACC
+                                                                F1_result,
+                                                                AUC,
+                                                                ACC
                                                                 ))
 
     # print the training result info
