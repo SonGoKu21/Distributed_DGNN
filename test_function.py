@@ -91,7 +91,7 @@ def run_dgnn_distributed(args):
     model = _My_DGNN(args, in_feats=load_feats[0].shape[1]).to(device)
     model.set_comm()
     # model = LocalDDP(copy.deepcopy(model), mp_group, dp_group, world_size)
-    print('worker {} already put the model to device {}'.format(rank, args['device']))
+    print('worker {} has already put the model to device {}'.format(rank, args['device']))
     model = DDP(model, process_group=dp_group)
 
     # loss_func = nn.BCELoss()
@@ -120,23 +120,19 @@ def run_dgnn_distributed(args):
             Loss.append(loss.item())
             optimizer.zero_grad()
             loss.backward()
-            print('epoch {} worker {} completes gradients computation!'.format(epoch, args['rank']))
+            # print('epoch {} worker {} completes gradients computation!'.format(epoch, args['rank']))
             optimizer.step()
             epoch_train_time.append(time.time() - train_start_time)
             if args['distributed']:
                 epoch_comm_time.append(args['comm_cost'])
             else: epoch_comm_time.append(0)
         # print(out)
-        print('evaluation start!')
         # test
         if epoch % args['test_freq'] == 0 and rank != world_size - 1:
-            print('epoch {} worker {} helper!'.format(epoch, args['rank']))
             graphs = [graph.to(device) for graph in graphs]
             test_result = model(graphs, torch.tensor(dataset['test_data']).to(device))
-            print('epoch {} worker {} waiting!'.format(epoch, args['rank']))
 
         elif epoch % args['test_freq'] == 0 and rank == world_size - 1:
-            print('{} outputer!'.format(rank))
             model.eval()
             graphs = [graph.to(device) for graph in graphs]
             test_result = model(graphs, torch.tensor(dataset['test_data']).to(device))
