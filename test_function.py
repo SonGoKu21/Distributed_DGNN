@@ -4,6 +4,7 @@ import torch.utils.data as Data
 import torch.nn as nn
 import copy
 import time
+import pandas as pd
 
 from data_process import load_graphs
 from data_process import get_data_example
@@ -104,6 +105,8 @@ def run_dgnn_distributed(args):
     epochs_acc = []
     total_train_time = 0
     total_comm_time = 0
+    log_loss = []
+    log_acc = []
 
     # train
     for epoch in range (args['epochs']):
@@ -152,6 +155,8 @@ def run_dgnn_distributed(args):
             epochs_auc.append(AUC)
             epochs_acc.append(ACC)
             gpu_mem_alloc = torch.cuda.max_memory_allocated() / 1000000 if torch.cuda.is_available() else 0
+            log_loss.append(np.mean(Loss))
+            log_acc.append(ACC)
             print("Epoch {:<3}, Loss = {:.3f}, F1 Score = {:.3f}, AUC = {:.3f}, ACC = {:.3f}, Time = {:.5f}|{:.5f}({:.3f}%), Memory Usage {:.2f}%".format(
                                                                 epoch,
                                                                 np.mean(Loss),
@@ -174,6 +179,11 @@ def run_dgnn_distributed(args):
         print("Best acc epoch: {}, Best acc score: {}".format(best_acc_epoch, max(epochs_acc)))
         print("Total training cost: {:.3f}, total communication cost: {:.3f}".format(total_train_time, total_comm_time))
 
+        if args['save_log']:
+            df_loss=pd.DataFrame(cdata=log_loss)
+            df_loss.to_csv('./experiment_results/{}_{}_{}_loss.csv'.format(args['dataset'], args['time_steps'], args['world_size']))
+            df_acc=pd.DataFrame(cdata=log_acc)
+            df_acc.to_csv('./experiment_results/{}_{}_{}_acc.csv'.format(args['dataset'], args['time_steps'], args['world_size']))
 
 def run_dgnn(args):
     r"""
