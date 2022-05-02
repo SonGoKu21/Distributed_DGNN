@@ -126,12 +126,15 @@ def run_dgnn_distributed(args):
                 epoch_comm_time.append(args['comm_cost'])
             else: epoch_comm_time.append(0)
         # print(out)
+        print('evaluation start!')
         # test
         if epoch % args['test_freq'] == 0 and rank != world_size - 1:
+            print('helper!')
             graphs = [graph.to(device) for graph in graphs]
             test_result = model(graphs, torch.tensor(dataset['test_data']).to(device))
 
         if epoch % args['test_freq'] == 0 and rank == world_size - 1:
+            print('outputer!')
             model.eval()
             graphs = [graph.to(device) for graph in graphs]
             test_result = model(graphs, torch.tensor(dataset['test_data']).to(device))
