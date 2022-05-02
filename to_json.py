@@ -39,6 +39,9 @@ parser.add_argument('--learning_rate', type=float, nargs='?', default=0.001,
 parser.add_argument('--weight_decay', type=float, nargs='?', default=0.0005,
                     help='Initial learning rate for self-attention model.')
 
+parser.add_argument('--save_log', type=bool, nargs='?', default=True,
+                    help='Save the loss and accuracy outputs')
+
 args = vars(parser.parse_args())
 
 b = json.dumps(args)
