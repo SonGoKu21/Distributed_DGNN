@@ -14,7 +14,7 @@ from datetime import timedelta
 import dateutil.parser
 
 current_path = os.getcwd()
-save_graph_path = current_path + '/Data/Enron/data/graphs.npz'
+save_graph_path = current_path + '/data/graphs.npz'
 
 def lines_per_n(f, n):
     for line in f:
