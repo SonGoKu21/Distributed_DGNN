@@ -146,13 +146,16 @@ def run_dgnn_distributed(args):
             epochs_f1_score.append(F1_result)
             epochs_auc.append(AUC)
             epochs_acc.append(ACC)
-            print("Epoch {:<3}, Time = {:.5f}|{:.5f}({:.3f}%), Loss = {:.3f}, F1 Score = {:.3f}, AUC = {:.3f}, ACC = {:.3f}".format(epoch,
-                                                                np.sum(epoch_train_time), np.sum(epoch_comm_time),
-                                                                (np.sum(epoch_comm_time)/np.sum(epoch_train_time))*100,
+            gpu_mem_alloc = torch.cuda.max_memory_allocated() / 1000000 if torch.cuda.is_available() else 0
+            print("Epoch {:<3}, Loss = {:.3f}, F1 Score = {:.3f}, AUC = {:.3f}, ACC = {:.3f}, Time = {:.5f}|{:.5f}({:.3f}%), Memory Usage {:.2f}%".format(
+                                                                epoch,
                                                                 np.mean(Loss),
                                                                 F1_result,
                                                                 AUC,
-                                                                ACC
+                                                                ACC,
+                                                                np.sum(epoch_train_time), np.sum(epoch_comm_time),
+                                                                (np.sum(epoch_comm_time)/np.sum(epoch_train_time))*100,
+                                                                gpu_mem_alloc/16160
                                                                 ))
 
     # print the training result info
