@@ -15,7 +15,7 @@ def _test_distributed(rank, args, real_dist):
     args['rank'] = rank
 
     if real_dist:
-        comm_method = 'gloo'
+        comm_method = 'nccl'
     else:  
         comm_method = 'gloo'
 
