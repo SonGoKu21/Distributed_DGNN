@@ -14,14 +14,8 @@ def _test_distributed(rank, args, real_dist):
     world_size = args['world_size']
 
     if real_dist:
-        local_rank = torch.distributed.get_rank()
-        torch.cuda.set_device(local_rank)
-        device = torch.device("cuda", local_rank)
-        args['device'] = device
         comm_method = 'nccl'
     else:  
-        device = torch.device("cpu")
-        args['device'] = device
         comm_method = 'gloo'
 
     # init the communication group
@@ -32,6 +26,15 @@ def _test_distributed(rank, args, real_dist):
                                          world_size = world_size,
                                          rank = rank,
                                         )
+    
+    if real_dist:
+        local_rank = torch.distributed.get_rank()
+        torch.cuda.set_device(local_rank)
+        device = torch.device("cuda", local_rank)
+        args['device'] = device
+    else:  
+        device = torch.device("cpu")
+        args['device'] = device
 
     # init mp group for intermediate data exchange
     group_idx = range(world_size)
