@@ -129,12 +129,13 @@ def run_dgnn_distributed(args):
         print('evaluation start!')
         # test
         if epoch % args['test_freq'] == 0 and rank != world_size - 1:
-            print('helper!')
+            print('{} helper!'.format(rank))
             graphs = [graph.to(device) for graph in graphs]
             test_result = model(graphs, torch.tensor(dataset['test_data']).to(device))
+            print('{} waiting!'.format(rank))
 
-        if epoch % args['test_freq'] == 0 and rank == world_size - 1:
-            print('outputer!')
+        elif epoch % args['test_freq'] == 0 and rank == world_size - 1:
+            print('{} outputer!'.format(rank))
             model.eval()
             graphs = [graph.to(device) for graph in graphs]
             test_result = model(graphs, torch.tensor(dataset['test_data']).to(device))
