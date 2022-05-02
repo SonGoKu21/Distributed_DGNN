@@ -52,7 +52,7 @@ class _My_DGNN(torch.nn.Module):
 
 # TODO: complete the global forward
 def run_dgnn_distributed(args):
-    args['distributed'] = False
+    args['distributed'] = True
     device = args['device']
     rank = args['rank']
     world_size = args['world_size']
@@ -69,8 +69,8 @@ def run_dgnn_distributed(args):
     load_g, load_adj, load_feats = slice_graph(*load_graphs(args))
     num_graph = len(load_g)
     args['structural_time_steps'] = num_graph
-    # args['temporal_time_steps'] = num_graph*(rank + 1)
-    args['temporal_time_steps'] = num_graph
+    args['temporal_time_steps'] = num_graph*(rank + 1)
+    # args['temporal_time_steps'] = num_graph
     print("Loaded {}/{} graphs".format(num_graph, args['time_steps']))
 
     dataset = load_dataset(*get_data_example(load_g, args, num_graph))
@@ -94,7 +94,7 @@ def run_dgnn_distributed(args):
     model.set_comm()
     # model = LocalDDP(copy.deepcopy(model), mp_group, dp_group, world_size)
     print('worker {} has already put the model to device {}'.format(rank, args['device']))
-    # model = DDP(model, process_group=dp_group)
+    model = DDP(model, process_group=dp_group)
 
     # loss_func = nn.BCELoss()
     loss_func = nn.CrossEntropyLoss()
