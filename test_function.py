@@ -122,6 +122,7 @@ def run_dgnn_distributed(args):
             loss.backward()
             optimizer.step()
             epoch_train_time.append(time.time() - train_start_time)
+            print('epoch {} worker {} completes gradients computation!'.format(epoch, args['rank']))
             if args['distributed']:
                 epoch_comm_time.append(args['comm_cost'])
             else: epoch_comm_time.append(0)
