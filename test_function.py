@@ -180,9 +180,9 @@ def run_dgnn_distributed(args):
         print("Total training cost: {:.3f}, total communication cost: {:.3f}".format(total_train_time, total_comm_time))
 
         if args['save_log']:
-            df_loss=pd.DataFrame(cdata=log_loss)
+            df_loss=pd.DataFrame(data=log_loss)
             df_loss.to_csv('./experiment_results/{}_{}_{}_loss.csv'.format(args['dataset'], args['time_steps'], args['world_size']))
-            df_acc=pd.DataFrame(cdata=log_acc)
+            df_acc=pd.DataFrame(data=log_acc)
             df_acc.to_csv('./experiment_results/{}_{}_{}_acc.csv'.format(args['dataset'], args['time_steps'], args['world_size']))
 
 def run_dgnn(args):
