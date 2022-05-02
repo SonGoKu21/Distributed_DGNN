@@ -229,10 +229,11 @@ def run_dgnn(args):
     epochs_acc = []
     log_loss = []
     log_acc = []
-
+    total_train_time = 0
     # train
     for epoch in range (args['epochs']):
         Loss = []
+        epoch_time_start = time.time()
         for step, (batch_x, batch_y) in enumerate(loader):
             model.train()
             batch_x = batch_x.to(device)
@@ -245,6 +246,7 @@ def run_dgnn(args):
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+        total_train_time += time.time() - epoch_time_start
         # print(out)
         # test
         if epoch % args['test_freq'] == 0:
@@ -263,6 +265,8 @@ def run_dgnn(args):
             epochs_f1_score.append(F1_result)
             epochs_auc.append(AUC)
             epochs_acc.append(ACC)
+            log_loss.append(np.mean(Loss))
+            log_acc.append(ACC)
             print("Epoch {:<3}, Loss = {:.3f}, F1 Score {:.3f}, AUC {:.3f}, ACC {:.3f}".format(epoch,
                                                                 np.mean(Loss),
                                                                 F1_result,
@@ -277,6 +281,7 @@ def run_dgnn(args):
     print("Best f1 score epoch: {}, Best f1 score: {}".format(best_f1_epoch, max(epochs_f1_score)))
     print("Best auc epoch: {}, Best auc score: {}".format(best_auc_epoch, max(epochs_auc)))
     print("Best acc epoch: {}, Best acc score: {}".format(best_acc_epoch, max(epochs_acc)))
+    print("Total training cost: {:.3f}".format(total_train_time))
 
     if args['save_log']:
         df_loss=pd.DataFrame(data=log_loss)
