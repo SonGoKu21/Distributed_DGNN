@@ -227,6 +227,8 @@ def run_dgnn(args):
     epochs_f1_score = []
     epochs_auc = []
     epochs_acc = []
+    log_loss = []
+    log_acc = []
 
     # train
     for epoch in range (args['epochs']):
@@ -275,6 +277,12 @@ def run_dgnn(args):
     print("Best f1 score epoch: {}, Best f1 score: {}".format(best_f1_epoch, max(epochs_f1_score)))
     print("Best auc epoch: {}, Best auc score: {}".format(best_auc_epoch, max(epochs_auc)))
     print("Best acc epoch: {}, Best acc score: {}".format(best_acc_epoch, max(epochs_acc)))
+
+    if args['save_log']:
+        df_loss=pd.DataFrame(data=log_loss)
+        df_loss.to_csv('./experiment_results/{}_{}_{}_loss.csv'.format(args['dataset'], args['time_steps'], args['world_size']))
+        df_acc=pd.DataFrame(data=log_acc)
+        df_acc.to_csv('./experiment_results/{}_{}_{}_acc.csv'.format(args['dataset'], args['time_steps'], args['world_size']))
 
 
 
