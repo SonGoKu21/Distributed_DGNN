@@ -12,6 +12,7 @@ from test_function import run_dgnn_distributed, run_dgnn
 
 def _test_distributed(rank, args, real_dist):
     world_size = args['world_size']
+    args['rank'] = rank
 
     if real_dist:
         comm_method = 'nccl'
@@ -29,8 +30,12 @@ def _test_distributed(rank, args, real_dist):
     
     if real_dist:
         local_rank = torch.distributed.get_rank()
-        torch.cuda.set_device(local_rank)
-        device = torch.device("cuda", local_rank)
+        if args['rank'] = 0:
+            device = torch.device("cpu")
+        else:
+            device = torch.device("cuda")
+         # torch.cuda.set_device(local_rank)
+        # device = torch.device("cuda", local_rank)
         args['device'] = device
     else:  
         device = torch.device("cpu")
@@ -53,7 +58,6 @@ def _test_distributed(rank, args, real_dist):
                         backend = comm_method,
                         )   
 
-    args['rank'] = rank
     # print(locals())
     run_dgnn_distributed(args)
 
