@@ -15,7 +15,7 @@ def _test_distributed(rank, args, real_dist):
     args['rank'] = rank
 
     if real_dist:
-        comm_method = 'nccl'
+        comm_method = 'gloo'
     else:  
         comm_method = 'gloo'
 
@@ -30,7 +30,7 @@ def _test_distributed(rank, args, real_dist):
     
     if real_dist:
         local_rank = torch.distributed.get_rank()
-        if args['rank'] = 0:
+        if args['rank'] == 0:
             device = torch.device("cpu")
         else:
             device = torch.device("cuda")
