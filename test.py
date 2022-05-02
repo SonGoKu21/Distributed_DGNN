@@ -14,7 +14,9 @@ def _test_distributed(rank, args, real_dist):
     world_size = args['world_size']
 
     if real_dist:
-        device = torch.cuda.set_device(rank)
+        local_rank = torch.distributed.get_rank()
+        torch.cuda.set_device(local_rank)
+        device = torch.device("cuda", local_rank)
         args['device'] = device
         comm_method = 'nccl'
     else:  
