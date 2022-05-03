@@ -250,7 +250,7 @@ def run_dgnn(args):
             loss.backward()
             optimizer.step()
             epoch_train_time.append(time.time() - train_start_time)
-        total_train_time += time.time() - epoch_time_start
+        total_train_time += np.sum(epoch_train_time)
         # print(out)
         # test
         if epoch % args['test_freq'] == 0:
