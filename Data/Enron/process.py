@@ -92,9 +92,13 @@ if __name__ == "__main__":
 
     # print statics of each graph
     used_nodes = []
+    average_nodes = []
+    average_edges = []
     for id, slice in slice_links.items():
         print("In snapshoot {:<2}, #Nodes={:<5}, #Edges={:<5}".format(id, \
                             slice.number_of_nodes(), slice.number_of_edges()))
+        average_nodes.append(slice.number_of_nodes())
+        average_edges.append(slice.number_of_edges())
         for node in slice.nodes():
             if not node in used_nodes:
                 used_nodes.append(node)
@@ -113,6 +117,8 @@ if __name__ == "__main__":
         slice.graph["feature"] = csr_matrix(tmp_feature)
         graphs.append(slice)
     
+    print('average nodes: {}; average edges: {}'.format(np.mean(average_nodes), np.mean(average_edges)))
+
     # save
     save_path = "../data/graph.pkl"
     with open(save_graph_path, "wb") as f:
