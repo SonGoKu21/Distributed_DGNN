@@ -119,8 +119,8 @@ def run_dgnn_distributed(args):
             model.train()
             batch_x = batch_x.to(device)
             batch_y = batch_y.to(device)
-            train_start_time = time.time()
             graphs = [graph.to(device) for graph in graphs]
+            train_start_time = time.time()
             out = model(graphs, batch_x)
             # print(out)
             loss = loss_func(out.squeeze(dim=-1), batch_y)
@@ -234,12 +234,14 @@ def run_dgnn(args):
     # train
     for epoch in range (args['epochs']):
         Loss = []
+        epoch_train_time = []
         epoch_time_start = time.time()
         for step, (batch_x, batch_y) in enumerate(loader):
             model.train()
             batch_x = batch_x.to(device)
             batch_y = batch_y.to(device)
             graphs = [graph.to(device) for graph in graphs]
+            train_start_time = time.time()
             out = model(graphs, batch_x)
             # print(out)
             loss = loss_func(out.squeeze(dim=-1), batch_y)
@@ -247,6 +249,7 @@ def run_dgnn(args):
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+            epoch_train_time.append(time.time() - train_start_time)
         total_train_time += time.time() - epoch_time_start
         # print(out)
         # test
@@ -268,11 +271,12 @@ def run_dgnn(args):
             epochs_acc.append(ACC)
             log_loss.append(np.mean(Loss))
             log_acc.append(ACC)
-            print("Epoch {:<3}, Loss = {:.3f}, F1 Score {:.3f}, AUC {:.3f}, ACC {:.3f}".format(epoch,
+            print("Epoch {:<3}, Loss = {:.3f}, F1 Score {:.3f}, AUC {:.3f}, ACC {:.3f}, Time = {:.5f}".format(epoch,
                                                                 np.mean(Loss),
                                                                 F1_result,
                                                                 AUC,
-                                                                ACC))
+                                                                ACC,
+                                                                np.sum(epoch_train_time)))
 
     # print the training result info
     best_f1_epoch = epochs_f1_score.index(max(epochs_f1_score))
