@@ -134,7 +134,7 @@ def run_dgnn_distributed(args):
                 epoch_comm_time.append(args['comm_cost'])
                 total_comm_time += args['comm_cost']
             else: epoch_comm_time.append(0)
-        total_train_time += time.time() - epoch_time_start
+        total_train_time += np.sum(epoch_train_time)
         # print(out)
         # test
         if epoch % args['test_freq'] == 0 and rank != world_size - 1:
