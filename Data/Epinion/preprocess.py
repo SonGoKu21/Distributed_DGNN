@@ -203,5 +203,6 @@ for i in range (len(slices_links_remap)):
     # Differences.append(temp)
 print(Links,Nodes)
 
+print('average nodes: {}; average edges: {}'.format(np.mean(Nodes), np.mean(Links)))
 np.savez(save_graph_path, graph=slices_links_remap)  # graph为字典的key
 np.savez(save_features_path, feats=slices_features_remap)
