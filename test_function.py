@@ -163,12 +163,12 @@ def run_dgnn_distributed(args):
         # test
         if epoch % args['test_freq'] == 0 and rank != world_size - 1:
             graphs = [graph.to(device) for graph in graphs]
-            test_result = model(graphs, torch.tensor(dataset['test_data'], gate).to(device))
+            test_result = model(graphs, torch.tensor(dataset['test_data']).to(device), gate)
 
         elif epoch % args['test_freq'] == 0 and rank == world_size - 1:
             # model.eval()
             graphs = [graph.to(device) for graph in graphs]
-            test_result = model(graphs, torch.tensor(dataset['test_data'], gate).to(device))
+            test_result = model(graphs, torch.tensor(dataset['test_data']).to(device), gate)
             prob_f1 = []
             prob_auc = []
             prob_f1.extend(np.argmax(test_result.detach().cpu().numpy(), axis = 1))
