@@ -98,7 +98,9 @@ def run_dgnn_distributed(args):
             args['temporal_time_steps'] = num_graph*(rank + 1)
     else:
         args['temporal_time_steps'] = num_graph
-    print("Loaded {}/{} graphs".format(num_graph, args['time_steps']))
+    print("Worer {} loads {}/{} graphs, where {} local graphs, {} remote graphs.".format(
+        rank, num_graph, args['time_steps']),
+        num_graph, args['temporal_time_steps'] -1)
 
     # generate dataset
     dataset = load_dataset(*get_data_example(load_g, args, num_graph))
@@ -119,7 +121,7 @@ def run_dgnn_distributed(args):
     graphs = convert_graphs(load_g, load_adj, load_feats, args['data_str'])
 
     model = _My_DGNN(args, in_feats=load_feats[0].shape[1]).to(device)
-    print('worker {} has already put the model to device {}'.format(rank, args['device']))
+    print('Worker {} has already put the model to device {}'.format(rank, args['device']))
     model.set_comm()
     # distributed ?
     # model = LocalDDP(copy.deepcopy(model), mp_group, dp_group, world_size)

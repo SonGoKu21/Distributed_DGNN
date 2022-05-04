@@ -152,16 +152,17 @@ def get_data_example(graphs, args, local_time_steps):
     try:
         train_edges, train_edges_false, val_edges, val_edges_false, test_edges, test_edges_false = \
             np.load(eval_path, encoding='bytes', allow_pickle=True)['data']
-        print("Loaded classification evaluation data!")
+        print("Worker {} loads classification training data!".format(args['rank']))
     except IOError:
-        print("Generating and saving eval data ....")
+        print("Worker {} is Generating and saving training samples ....".format(args['rank']))
         train_edges, train_edges_false, val_edges, val_edges_false, test_edges, test_edges_false = \
             _create_data_splits(eval_graph, next_graph, val_mask_fraction=0.1,
                             test_mask_fraction=0.3)
         np.savez(eval_path, data=np.array([train_edges, train_edges_false, val_edges, val_edges_false,
                                            test_edges, test_edges_false]))
     
-    print("No. Train: Pos={}, Neg={} \nNo. Val: Pos={}, Neg={} \nNo. Test: Pos={}, Neg={}".format(
+    print("Worker {} has training samples as No. \nTrain: Pos={}, Neg={} \nNo. Val: Pos={}, Neg={} \nNo. Test: Pos={}, Neg={}".format(
+          args['rank'],
           len(train_edges), len(train_edges_false), len(val_edges), len(val_edges_false),
           len(test_edges), len(test_edges_false)))
 
