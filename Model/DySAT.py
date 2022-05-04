@@ -26,8 +26,8 @@ def _customized_embedding_comm(args, x, gate):
     # re-construct the communication map according to the 'gate' matrix
     worker_list = torch.tensor(range(world_size))
     temporal_list = [worker_list[gate[:, i]].numpy() for i in range (global_time_steps)]
-    print('gate: ', gate)
-    print('temporal_list: ',temporal_list)
+    # print('gate: ', gate)
+    # print('temporal_list: ',temporal_list)
     mp_groups = [torch.distributed.new_group(
             ranks = temporal_list[i],
             backend = comm_method,
