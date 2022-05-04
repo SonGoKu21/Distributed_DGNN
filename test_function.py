@@ -93,7 +93,7 @@ def run_dgnn_distributed(args):
     if args['connection']:
         if args['gate']:
             temporal_list = torch.tensor(range(args['time_steps']))
-            args['temporal_time_steps'] = len(temporal_list[rank,:].numpy())
+            args['temporal_time_steps'] = len(temporal_list[gate[rank,:]].numpy())
         else:
             args['temporal_time_steps'] = num_graph*(rank + 1)
     else:
