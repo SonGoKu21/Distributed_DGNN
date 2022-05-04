@@ -13,21 +13,29 @@ from Model.layers import TemporalAttentionLayer
 
 
 def _customized_embedding_comm(args, x, gate):
-    groups = args['mp_group']
+    r"""
+    Gate: a [N, T] bool matrix, to identify the temporal dependecy for each snapshot
+    """
+    comm_method = 'gloo'
+    # groups = args['mp_group']
     rank = args['rank']
     world_size = args['world_size']
     global_time_steps = args['time_steps']
     num_graph_per_worker = global_time_steps/world_size
 
+    # re-construct the communication map according to the 'gate' matrix
+    worker_list = torch.tensor(range(world_size))
+    temporal_list = [worker_list[gate[:, i]].numpy() for i in range (global_time_steps)]
+    print('gate: ', gate)
+    print('temporal_list: ',temporal_list)
+    mp_groups = [torch.distributed.new_group(
+            ranks = temporal_list[i],
+            backend = comm_method,
+        ) for i in range (global_time_steps)
+        ]
+
     comm_tensor = x.clone().detach()[:,-1,:]
     result_list = []
-
-    for i in range(global_time_steps):
-        src = i//num_graph_per_worker
-        for j in range(world_size)[j+1:]:
-            if gate[j, i]:
-                torch.distributed.broadcast(comm_tensor, i, group = groups[src][j])
-
 
     return 0
 
@@ -106,7 +114,7 @@ class DySAT(nn.Module):
         self.bceloss = BCEWithLogitsLoss()
 
 
-    def forward(self, graphs):
+    def forward(self, graphs, gate):
         # TODO: communicate the imtermediate embeddings after StructureAtt
 
         # Structural Attention forward
@@ -127,12 +135,14 @@ class DySAT(nn.Module):
 
         # print('rank: {} with tensor size {}'.format(self.args['rank'], structural_outputs_padded.size()))
 
+
         # Temporal Attention forward
         if self.args['distributed']:
             self.args['comm_cost'] = 0
             comm_start = time.time()
             # exchange node embeddings
-            fuse_structural_output = _embedding_comm(self.args, structural_outputs_padded)
+            # fuse_structural_output = _embedding_comm(self.args, structural_outputs_padded)
+            fuse_structural_output = _customized_embedding_comm(self.args, structural_outputs_padded, gate)
             self.args['comm_cost'] += time.time() - comm_start
             # print('comm_cost in worker {} with time {}'.format(self.args['rank'], self.args['comm_cost']))
             temporal_out = self.temporal_attn(fuse_structural_output)
@@ -171,3 +181,6 @@ class DySAT(nn.Module):
             input_dim = self.temporal_layer_config[i]
 
         return structural_attention_layers, temporal_attention_layers
+
+if __name__ == '__main__':
+    _customized_embedding_comm()

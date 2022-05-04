@@ -34,8 +34,8 @@ class _My_DGNN(torch.nn.Module):
         for p in self.classificer.parameters():
             setattr(p, 'dp_comm', 'dp')
 
-    def forward(self, graphs, nids):
-        final_emb = self.dgnn(graphs)
+    def forward(self, graphs, nids, gate):
+        final_emb = self.dgnn(graphs, gate)
         # print(nids)
         # get embeddings of nodes in the last graph
         emb = final_emb[:, -1, :]
@@ -48,6 +48,21 @@ class _My_DGNN(torch.nn.Module):
         input_emb = source_emb.mul(target_emb)
         # print(input_emb)
         return self.classificer(input_emb)
+
+def _gate(args):
+    global_time_steps = args['time_steps']
+    world_size = args['world_size']
+    gate = torch.zeros(world_size, global_time_steps).bool()
+
+    for i in range (world_size):
+        for j in range (global_time_steps):
+            if i == j or i == j - 1:
+                gate[i,j] = True
+            else: gate[i,j] = False
+    
+    return gate
+
+
 
 
 # TODO: complete the global forward
@@ -109,6 +124,8 @@ def run_dgnn_distributed(args):
     log_loss = []
     log_acc = []
 
+    gate = _gate(args)
+    
     # train
     for epoch in range (args['epochs']):
         Loss = []
@@ -121,7 +138,7 @@ def run_dgnn_distributed(args):
             batch_y = batch_y.to(device)
             graphs = [graph.to(device) for graph in graphs]
             train_start_time = time.time()
-            out = model(graphs, batch_x)
+            out = model(graphs, batch_x, gate)
             # print(out)
             loss = loss_func(out.squeeze(dim=-1), batch_y)
             Loss.append(loss.item())
