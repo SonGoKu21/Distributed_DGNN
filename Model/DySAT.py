@@ -159,8 +159,10 @@ class DySAT(nn.Module):
             self.args['comm_cost'] = 0
             comm_start = time.time()
             # exchange node embeddings
-            # fuse_structural_output = _embedding_comm(self.args, structural_outputs_padded)
-            fuse_structural_output = _customized_embedding_comm(self.args, structural_outputs_padded, gate)
+            if self.args['gate']:
+                fuse_structural_output = _customized_embedding_comm(self.args, structural_outputs_padded, gate)
+            else:
+                fuse_structural_output = _embedding_comm(self.args, structural_outputs_padded)
             self.args['comm_cost'] += time.time() - comm_start
             # print('comm_cost in worker {} with time {}'.format(self.args['rank'], self.args['comm_cost']))
             temporal_out = self.temporal_attn(fuse_structural_output)
