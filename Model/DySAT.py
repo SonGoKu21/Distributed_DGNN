@@ -42,7 +42,7 @@ def _customized_embedding_comm(args, x, gate):
         if rank < src:
             break
         if rank == src:
-            comm_tensor = x.clone().detach()[:,i%num_graph_per_worker:i%num_graph_per_worker + 1,:]
+            comm_tensor = x.clone().detach()[:,int(i%num_graph_per_worker):int(i%num_graph_per_worker + 1),:]
         if len(temporal_list[i]) > 1 and rank in temporal_list[i]:
             # print('The {}-th graph need to be sent, sender {}, local rank {}'.format(i, int(src), rank))
             torch.distributed.broadcast(comm_tensor, src, group = mp_groups[i])
