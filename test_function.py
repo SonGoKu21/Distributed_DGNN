@@ -54,9 +54,11 @@ def _gate(args):
     world_size = args['world_size']
     gate = torch.zeros(world_size, global_time_steps).bool()
 
+    graphs_per_worker = global_time_steps/world_size
+
     for i in range (world_size):
         for j in range (global_time_steps):
-            if i == j or i == j - 1:
+            if j >= i*graphs_per_worker - 1 and j < (i+1)*graphs_per_worker:
                 gate[i,j] = True
             else: gate[i,j] = False
     
