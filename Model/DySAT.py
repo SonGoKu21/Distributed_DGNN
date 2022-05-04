@@ -49,9 +49,10 @@ def _customized_embedding_comm(args, x, gate):
     if len(result_list) > 0:
         result_list.append(x)
         final = torch.cat(result_list, 1)
-        # print('rank: {} with fused tensor {}'.format(rank, final))
         return final
     else: final = x.clone()
+
+    print('rank: {} with fused tensor size {}'.format(rank, final.size()))
 
     return final
 
