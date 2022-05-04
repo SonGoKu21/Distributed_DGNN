@@ -69,7 +69,7 @@ def _gate(args):
 
 # TODO: complete the global forward
 def run_dgnn_distributed(args):
-    args['distributed'] = True
+    args['connection'] = True
     device = args['device']
     rank = args['rank']
     world_size = args['world_size']
@@ -85,14 +85,21 @@ def run_dgnn_distributed(args):
     # load graphs
     load_g, load_adj, load_feats = slice_graph(*load_graphs(args))
     num_graph = len(load_g)
+    gate = _gate(args)
+
+    # generate the num of graphs for each module in DGNN
     args['structural_time_steps'] = num_graph
-    # args['temporal_time_steps'] = num_graph*(rank + 1)
-    if rank == 0:
-        args['temporal_time_steps'] = num_graph
+    if args['connection']:
+        if args['gate']:
+            temporal_list = torch.tensor(range(args['time_steps']))
+            args['temporal_time_steps'] = len(temporal_list[rank,:].numpy())
+        else:
+            args['temporal_time_steps'] = num_graph*(rank + 1)
     else:
-        args['temporal_time_steps'] = num_graph + 1
+        args['temporal_time_steps'] = num_graph
     print("Loaded {}/{} graphs".format(num_graph, args['time_steps']))
 
+    # generate dataset
     dataset = load_dataset(*get_data_example(load_g, args, num_graph))
 
     train_dataset = Data.TensorDataset(
@@ -111,9 +118,10 @@ def run_dgnn_distributed(args):
     graphs = convert_graphs(load_g, load_adj, load_feats, args['data_str'])
 
     model = _My_DGNN(args, in_feats=load_feats[0].shape[1]).to(device)
-    model.set_comm()
-    # model = LocalDDP(copy.deepcopy(model), mp_group, dp_group, world_size)
     print('worker {} has already put the model to device {}'.format(rank, args['device']))
+    model.set_comm()
+    # distributed ?
+    # model = LocalDDP(copy.deepcopy(model), mp_group, dp_group, world_size)
     # model = DDP(model, process_group=dp_group)
 
     # loss_func = nn.BCELoss()
@@ -128,8 +136,6 @@ def run_dgnn_distributed(args):
     total_comm_time = 0
     log_loss = []
     log_acc = []
-
-    gate = _gate(args)
     
     # train
     for epoch in range (args['epochs']):
@@ -152,7 +158,7 @@ def run_dgnn_distributed(args):
             # print('epoch {} worker {} completes gradients computation!'.format(epoch, args['rank']))
             optimizer.step()
             epoch_train_time.append(time.time() - train_start_time)
-            if args['distributed']:
+            if args['connection']:
                 epoch_comm_time.append(args['comm_cost'])
                 if epoch >= 5:
                     total_comm_time += args['comm_cost']
@@ -214,7 +220,7 @@ def run_dgnn(args):
     r"""
     run dgnn with one process
     """
-    args['distributed'] = False
+    args['connection'] = False
     device = args['device']
     # args['time_steps'] = 4
 

@@ -155,7 +155,7 @@ class DySAT(nn.Module):
 
 
         # Temporal Attention forward
-        if self.args['distributed']:
+        if self.args['connection']:
             self.args['comm_cost'] = 0
             comm_start = time.time()
             # exchange node embeddings
