@@ -11,6 +11,27 @@ from torch.nn.modules.loss import BCEWithLogitsLoss
 from Model.layers import StructuralAttentionLayer
 from Model.layers import TemporalAttentionLayer
 
+
+def _customized_embedding_comm(args, x, gate):
+    groups = args['mp_group']
+    rank = args['rank']
+    world_size = args['world_size']
+    global_time_steps = args['time_steps']
+    num_graph_per_worker = global_time_steps/world_size
+
+    comm_tensor = x.clone().detach()[:,-1,:]
+    result_list = []
+
+    for i in range(global_time_steps):
+        src = i//num_graph_per_worker
+        for j in range(world_size)[j+1:]:
+            if gate[j, i]:
+                torch.distributed.broadcast(comm_tensor, i, group = groups[src][j])
+
+
+    return 0
+
+
 def _embedding_comm(args, x):
     mp_group = args['mp_group']
     rank = args['rank']
