@@ -3,9 +3,11 @@ import sys
 import argparse
 import multiprocessing as mp
 import torch
+import warnings
 
 from test_function import run_dgnn_distributed, run_dgnn
 
+warnings.filterwarnings('ignore')
 # comm_method = 'gloo' # currently use 'gloo' for CPU process communication
 
 # TODO: implement the test with pytest framework
