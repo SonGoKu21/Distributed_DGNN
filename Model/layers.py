@@ -102,6 +102,7 @@ class TemporalAttentionLayer(nn.Module):
 
     def forward(self, inputs):
         """In:  attn_outputs (of StructuralAttentionLayer at each snapshot):= [N, T, F]"""
+        print(inputs.size(), position_inputs.size())
         # 1: Add position embeddings to input
         position_inputs = torch.arange(0,self.num_time_steps).reshape(1, -1).repeat(inputs.shape[0], 1).long().to(inputs.device)
         temporal_inputs = inputs + self.position_embeddings[position_inputs] # [N, T, F]
