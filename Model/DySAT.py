@@ -46,8 +46,8 @@ def _customized_embedding_comm(args, x, gate):
         if len(temporal_list[i]) > 1 and rank in temporal_list[i]:
             print('The {}-th graph need to be sent, sender {}, local rank {}'.format(i, int(src), rank))
             torch.distributed.broadcast(comm_tensor, src, group = mp_groups[i])
-        if rank != src: # receive
-            result_list.append(comm_tensor)
+            if rank != src: # receive
+                result_list.append(comm_tensor)
     
     if len(result_list) > 0:
         result_list.append(x)
