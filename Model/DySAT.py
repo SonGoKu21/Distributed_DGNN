@@ -37,7 +37,23 @@ def _customized_embedding_comm(args, x, gate):
     comm_tensor = x.clone().detach()[:,-1,:]
     result_list = []
 
-    return 0
+    for i in range (global_time_steps):
+        src = i//num_graph_per_worker
+        if rank < src:
+            break
+        if len(temporal_list[i]) > 1:
+            torch.distributed.broadcast(comm_tensor, src, group = mp_groups[i])
+        if rank != src: # receive
+            result_list.append(comm_tensor)
+    
+    if len(result_list) > 0:
+        result_list.append(x)
+        final = torch.cat(result_list, 1)
+        # print('rank: {} with fused tensor {}'.format(rank, final))
+        return final
+    else: final = x.clone()
+
+    return final
 
 
 def _embedding_comm(args, x):
