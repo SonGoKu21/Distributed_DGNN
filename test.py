@@ -22,10 +22,10 @@ def _test_distributed(rank, args, real_dist):
         comm_method = 'gloo'
 
     # init the communication group
-    dist_init_method = 'tcp://{master_ip}:{master_port}'.format(
-            master_ip='127.0.0.1', master_port='12345')
+    # dist_init_method = 'tcp://{master_ip}:{master_port}'.format(
+    #         master_ip='127.0.0.1', master_port='12345')
     torch.distributed.init_process_group(backend = comm_method,
-                                         init_method = dist_init_method,
+                                        #  init_method = dist_init_method,
                                          world_size = world_size,
                                          rank = rank,
                                         )
@@ -72,6 +72,11 @@ def _test_local(args):
 
 
 def _test_dp(args):
+    os.environ["MASTER_ADDR"] = "localhost"
+    os.environ["MASTER_PORT"] = "12345"
+    os.environ[
+        "TORCH_DISTRIBUTED_DEBUG"
+    ] = "DETAIL"
     torch.multiprocessing.set_start_method('spawn')
     real_dist = False
     world_size = args['world_size']
@@ -86,6 +91,11 @@ def _test_dp(args):
     
 
 def _test_ddp(args):
+    os.environ["MASTER_ADDR"] = "localhost"
+    os.environ["MASTER_PORT"] = "12345"
+    os.environ[
+        "TORCH_DISTRIBUTED_DEBUG"
+    ] = "DETAIL"
     torch.multiprocessing.set_start_method('spawn')
     world_size = args['world_size']
     # assert torch.cuda.device_count() >= world_size,\
