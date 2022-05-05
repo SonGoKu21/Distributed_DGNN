@@ -70,7 +70,8 @@ def _embedding_comm(args, x):
     for i in range (world_size - 1):
         if i > rank:
             break
-        torch.distributed.broadcast(comm_tensor, i, group = mp_group[i])
+        if rank <= i + 2:
+            torch.distributed.broadcast(comm_tensor, i, group = mp_group[i])
         if i != rank:
             result_list.append(comm_tensor)
     if len(result_list) > 0:
