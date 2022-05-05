@@ -73,7 +73,7 @@ def _test_local(args):
 
 def _test_dp(args):
     os.environ["MASTER_ADDR"] = "localhost"
-    os.environ["MASTER_PORT"] = "12345"
+    os.environ["MASTER_PORT"] = "12346"
     os.environ[
         "TORCH_DISTRIBUTED_DEBUG"
     ] = "DETAIL"
@@ -92,7 +92,7 @@ def _test_dp(args):
 
 def _test_ddp(args):
     os.environ["MASTER_ADDR"] = "localhost"
-    os.environ["MASTER_PORT"] = "12345"
+    os.environ["MASTER_PORT"] = "12346"
     os.environ[
         "TORCH_DISTRIBUTED_DEBUG"
     ] = "DETAIL"
