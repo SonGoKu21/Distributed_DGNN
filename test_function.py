@@ -145,8 +145,10 @@ def run_dgnn_distributed(args):
         Loss = []
         epoch_train_time = []
         epoch_comm_time = []
+        epoch_temp_time = []
         epoch_time_start = time.time()
         args['comm_cost'] = 0
+        args['temporal_cost'] = 0
         for step, (batch_x, batch_y) in enumerate(loader):
             model.train()
             batch_x = batch_x.to(device)
@@ -167,6 +169,9 @@ def run_dgnn_distributed(args):
                 if epoch >= 5:
                     total_comm_time += args['comm_cost']
             else: epoch_comm_time.append(0)
+
+            # temporal computation cost
+            epoch_temp_time.append(args['temporal_cost'])
         if epoch >= 5:
             total_train_time += np.sum(epoch_train_time)
         # print(out)
@@ -192,7 +197,7 @@ def run_dgnn_distributed(args):
             gpu_mem_alloc = torch.cuda.max_memory_allocated() / 1000000 if torch.cuda.is_available() else 0
             log_loss.append(np.mean(Loss))
             log_acc.append(ACC)
-            print("Epoch {:<3}, Loss = {:.3f}, F1 Score = {:.3f}, AUC = {:.3f}, ACC = {:.3f}, Time = {:.5f}|{:.5f}({:.3f}%), Memory Usage {:.2f}%".format(
+            print("Epoch {:<3}, Loss = {:.3f}, F1 Score = {:.3f}, AUC = {:.3f}, ACC = {:.3f}, Time = {:.5f}|{:.5f}({:.3f}%)&{:.5f}({:.3f}%), Memory Usage {:.2f}%".format(
                                                                 epoch,
                                                                 np.mean(Loss),
                                                                 F1_result,
@@ -200,6 +205,8 @@ def run_dgnn_distributed(args):
                                                                 ACC,
                                                                 np.sum(epoch_train_time), np.sum(epoch_comm_time),
                                                                 (np.sum(epoch_comm_time)/np.sum(epoch_train_time))*100,
+                                                                np.sum(epoch_temp_time),
+                                                                (np.sum(epoch_temp_time)/np.sum(epoch_train_time))*100,
                                                                 gpu_mem_alloc/16160
                                                                 ))
 

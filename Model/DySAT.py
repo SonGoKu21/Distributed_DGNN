@@ -164,8 +164,13 @@ class DySAT(nn.Module):
                 fuse_structural_output = _embedding_comm(self.args, structural_outputs_padded)
             self.args['comm_cost'] += time.time() - comm_start
             # print('comm_cost in worker {} with time {}'.format(self.args['rank'], self.args['comm_cost']))
+            temporal_time_start = time.time()
             temporal_out = self.temporal_attn(fuse_structural_output)
-        else: temporal_out = self.temporal_attn(structural_outputs_padded)
+            self.args['temporal_cost'] += time.time() - temporal_time_start
+        else: 
+            temporal_time_start = time.time()
+            temporal_out = self.temporal_attn(structural_outputs_padded)
+            self.args['temporal_cost'] += time.time() - temporal_time_start
 
 
         return temporal_out
